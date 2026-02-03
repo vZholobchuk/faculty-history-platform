@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request  
 from flask_cors import CORS
-from models import db, Event
+from models import db, Event, EventPhoto
 import os
 from werkzeug.utils import secure_filename
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
@@ -55,28 +55,35 @@ def get_events():
 @app.route('/api/events', methods=['POST'])
 @jwt_required()
 def add_event():
-    # Отримуємо дані, які прислав фронтенд (у форматі JSON)
     data = request.json
     
-    # Перевірка: чи є обов'язкові поля?
     if not data or not 'title' in data or not 'year' in data:
         return jsonify({"error": "Title and Year are required"}), 400
 
-    # Створюємо нову подію
+    # Створюємо подію
     new_event = Event(
         title=data['title'],
         year=data['year'],
-        description=data.get('description', ''), # Якщо опису немає, буде пустий рядок
+        description=data.get('description', ''),
         category=data['category'],
-        media_url=data.get('media_url', '')
+        media_url=data.get('media_url', '') # Це обкладинка
     )
 
-    # Додаємо в базу
+    # Зберігаємо подію, щоб отримати її ID
     db.session.add(new_event)
+    db.session.flush() # Це важливо! Ми ще не робимо commit, але вже отримуємо ID
+
+    # Обробляємо список фото для галереї (якщо він є)
+    gallery_urls = data.get('gallery', []) # Очікуємо список ["url1", "url2"]
+    
+    for url in gallery_urls:
+        photo = EventPhoto(url=url, event_id=new_event.id)
+        db.session.add(photo)
+
+    # Тепер зберігаємо все разом
     db.session.commit()
 
-    return jsonify(new_event.to_dict()), 201  # 201 означає "Created"
-
+    return jsonify(new_event.to_dict()), 201
 @app.route('/api/upload', methods=['POST'])
 @jwt_required()
 def upload_file():
