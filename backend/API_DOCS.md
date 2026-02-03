@@ -15,12 +15,15 @@
 - Відповідь: Масив подій `[ {id, title, year...}, ... ]`
 
 **POST** `/api/events` (🔒 Потрібен Токен)
-- Відправляєш JSON:
+- Тіло запиту (JSON):
   ```json
   {
     "title": "Назва події",
-    "year": 2025,
-    "category": "освіта",
-    "description": "Опис...",
-    "media_url": "/static/uploads/foto.jpg"
+    "year": 2024,
+    "category": "студенти",
+    "media_url": "/static/uploads/cover.jpg",  // Головне фото (обкладинка)
+    "gallery": [                               // НОВЕ: Список фото для альбому
+       "/static/uploads/photo1.jpg",
+       "/static/uploads/photo2.jpg"
+    ]
   }
