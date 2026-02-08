@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request  
 from flask_cors import CORS
-from models import db, Event, EventPhoto
+from models import db, Event, EventPhoto,Person,Document
 import os
 from werkzeug.utils import secure_filename
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
@@ -31,23 +31,22 @@ def home():
 # Оновлений ендпоінт з фільтрацією
 @app.route('/api/events', methods=['GET'])
 def get_events():
-    # Отримуємо параметри з URL (наприклад, ?category=наука&year=2010)
-    category = request.args.get('category')
     year = request.args.get('year')
-    
+    category = request.args.get('category')
+    search = request.args.get('search')  # <--- НОВЕ: Параметр пошуку
+
     query = Event.query
 
-    # Якщо передали категорію — фільтруємо
-    if category:
-        query = query.filter(Event.category.ilike(f'%{category}%')) # ilike робить пошук нечутливим до регістру
-    
-    # Якщо передали рік — фільтруємо
     if year:
         query = query.filter_by(year=year)
+    if category:
+        query = query.filter_by(category=category)
     
-    # Сортуємо події від старих до нових
-    events = query.order_by(Event.year.asc()).all()
+    # НОВЕ: Пошук по частині назви (нечутливий до регістру)
+    if search:
+        query = query.filter(Event.title.ilike(f'%{search}%'))
 
+    events = query.order_by(Event.year.desc()).all()
     return jsonify([event.to_dict() for event in events])
 
 
@@ -116,6 +115,135 @@ def login():
 
     access_token = create_access_token(identity=username)
     return jsonify(access_token=access_token)
+
+# --- РЕДАГУВАННЯ ТА ВИДАЛЕННЯ ПОДІЙ ---
+
+# 1. Редагувати подію (PUT)
+@app.route('/api/events/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_event(id):
+    # Шукаємо подію по ID
+    event = Event.query.get(id)
+    
+    if not event:
+        return jsonify({"message": "Event not found"}), 404
+
+    data = request.json
+    
+    # Оновлюємо тільки ті поля, які прийшли (якщо поля немає, залишаємо старе)
+    event.title = data.get('title', event.title)
+    event.year = data.get('year', event.year)
+    event.description = data.get('description', event.description)
+    event.category = data.get('category', event.category)
+    event.media_url = data.get('media_url', event.media_url)
+
+    # Якщо прислали нову галерею — стару видаляємо і пишемо нову
+    if 'gallery' in data:
+        # Видаляємо старі зв'язки
+        EventPhoto.query.filter_by(event_id=id).delete()
+        # Додаємо нові
+        for url in data['gallery']:
+            photo = EventPhoto(url=url, event_id=event.id)
+            db.session.add(photo)
+
+    db.session.commit()
+    return jsonify(event.to_dict())
+
+# 2. Видалити подію (DELETE)
+@app.route('/api/events/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_event(id):
+    event = Event.query.get(id)
+    
+    if not event:
+        return jsonify({"message": "Event not found"}), 404
+
+    # Видаляємо подію (фото з галереї видаляться автоматично через cascade)
+    db.session.delete(event)
+    db.session.commit()
+
+    return jsonify({"message": "Event deleted successfully"})
+
+# --- РОБОТА З ЛЮДЬМИ (PERSONS) ---
+
+# 1. Отримати список всіх людей (для сторінки "Гордість факультету")
+@app.route('/api/persons', methods=['GET'])
+def get_persons():
+    persons = Person.query.all()
+    return jsonify([p.to_dict() for p in persons])
+
+# 2. Додати нову людину 
+@app.route('/api/persons', methods=['POST'])
+@jwt_required()
+def add_person():
+    data = request.json
+    
+    if not data or not 'name' in data:
+        return jsonify({"error": "Name is required"}), 400
+
+    new_person = Person(
+        name=data['name'],
+        role=data.get('role', 'Випускник'),
+        bio=data.get('bio', ''),
+        photo_url=data.get('photo_url', '')
+    )
+
+    db.session.add(new_person)
+    db.session.commit()
+
+    return jsonify(new_person.to_dict()), 201
+
+# 3. Видалити людину 
+@app.route('/api/persons/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_person(id):
+    person = Person.query.get(id)
+    if not person:
+        return jsonify({"message": "Person not found"}), 404
+        
+    db.session.delete(person)
+    db.session.commit()
+    return jsonify({"message": "Person deleted"})
+
+# --- АРХІВ ДОКУМЕНТІВ ---
+
+# 1. Отримати всі документи
+@app.route('/api/documents', methods=['GET'])
+def get_documents():
+    docs = Document.query.all()
+    return jsonify([d.to_dict() for d in docs])
+
+# 2. Додати документ (Тільки Адмін)
+@app.route('/api/documents', methods=['POST'])
+@jwt_required()
+def add_document():
+    data = request.json
+    
+    if not data or not 'title' in data or not 'file_url' in data:
+        return jsonify({"error": "Title and File URL are required"}), 400
+
+    new_doc = Document(
+        title=data['title'],
+        category=data.get('category', 'Різне'),
+        file_url=data['file_url']
+    )
+
+    db.session.add(new_doc)
+    db.session.commit()
+
+    return jsonify(new_doc.to_dict()), 201
+
+# 3. Видалити документ (Тільки Адмін)
+@app.route('/api/documents/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_document(id):
+    doc = Document.query.get(id)
+    if not doc:
+        return jsonify({"message": "Document not found"}), 404
+        
+    db.session.delete(doc)
+    db.session.commit()
+    return jsonify({"message": "Document deleted"})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
