@@ -1,25 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import HeroSection from '../components/HeroSection';
 import StatCard from '../components/StatCard';
 import FeatureBox from '../components/FeatureBox';
-import { STATS_DATA, FEATURES_DATA } from '../data/mockData';
+
+import { FEATURES_DATA } from '../data/mockData';
+import { fetchStats } from '../services/api';
 
 const HomePage = () => {
+    const [stats, setStats] = useState([]);
+    const [isLoadingStats, setIsLoadingStats] = useState(true);
+    const [statsError, setStatsError] = useState(null);
+
+    useEffect(() => {
+        const loadStats = async () => {
+            try {
+                const data = await fetchStats();
+                setStats(data);
+                setIsLoadingStats(false);
+            } catch (err) {
+                setStatsError(err);
+                setIsLoadingStats(false);
+            }
+        };
+
+        loadStats();
+    }, []);
+
     return (
         <>
             <HeroSection />
 
             <section className="container mb-5">
-                <div className="row g-4">
-                    {STATS_DATA.map((stat, index) => (
-                        <StatCard
-                            key={index}
-                            icon={stat.icon}
-                            count={stat.count}
-                            label={stat.label}
-                        />
-                    ))}
-                </div>
+                {isLoadingStats ? (
+                    <div className="text-center py-5">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                ) : statsError ? (
+                    <div className="alert alert-danger text-center" role="alert">
+                        Failed to load statistics: {statsError.message}
+                    </div>
+                ) : (
+                    <div className="row g-4">
+                        {stats.map((stat, index) => (
+                            <StatCard
+                                key={index}
+                                icon={stat.icon}
+                                count={stat.count}
+                                label={stat.label}
+                            />
+                        ))}
+                    </div>
+                )}
             </section>
 
             <section className="about-section">

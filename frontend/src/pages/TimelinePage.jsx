@@ -1,6 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchHistory } from '../services/api';
 
 const TimelinePage = () => {
+    const [historyData, setHistoryData] = useState([]); // Renamed to avoid conflict with history object if used later
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const loadHistory = async () => {
+            try {
+                const data = await fetchHistory();
+                setHistoryData(data);
+                setIsLoading(false);
+            } catch (err) {
+                setError(err);
+                setIsLoading(false);
+            }
+        };
+        loadHistory();
+    }, []);
+
     return (
         <>
             <header className="timeline-header text-center">
@@ -29,45 +48,39 @@ const TimelinePage = () => {
                 <div className="timeline-wrapper">
                     <div className="timeline-line"></div>
 
-                    <div className="timeline-item left-item clearfix">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                            <span className="badge bg-primary year-badge">1940</span>
-                            <h4 className="fw-bold">Заснування інституту</h4>
-                            <p className="text-muted">Утворено Станіславський учительський інститут. Це початкова точка розвитку вищої освіти в нашому регіоні.</p>
-                            <div className="small text-primary fw-semibold"><i className="bi bi-tag-fill me-1"></i> Освіта</div>
+                    {isLoading ? (
+                        <div className="text-center py-5">
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="timeline-item right-item clearfix">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                            <span className="badge bg-primary year-badge">1991</span>
-                            <h4 className="fw-bold">Статус університету</h4>
-                            <p className="text-muted">На базі педагогічного інституту створено Прикарпатський університет. Важлива віха в історії закладу.</p>
-                            <img src="https://via.placeholder.com/400x200?text=History+1991" className="img-fluid rounded-3 mt-3 shadow-sm" alt="1991" />
+                    ) : error ? (
+                        <div className="alert alert-danger text-center" role="alert">
+                            Failed to load timeline: {error.message}
                         </div>
-                    </div>
+                    ) : (
+                        historyData.map((item, index) => (
+                            <div key={item.id} className={`timeline-item ${index % 2 === 0 ? 'left-item' : 'right-item'} clearfix`}>
+                                <div className="timeline-dot"></div>
+                                <div className="timeline-content">
+                                    <span className={`badge bg-${item.badgeColor || 'primary'} ${item.badgeColor === 'warning' ? 'text-dark' : ''} year-badge`}>{item.year}</span>
+                                    <h4 className="fw-bold">{item.title}</h4>
+                                    <p className="text-muted">{item.description}</p>
 
-                    <div className="timeline-item left-item clearfix">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                            <span className="badge bg-warning text-dark year-badge">2004</span>
-                            <h4 className="fw-bold">Національний статус</h4>
-                            <p className="text-muted">Університету присвоєно статус національного за вагомий внесок у розвиток науки та культури України.</p>
-                        </div>
-                    </div>
+                                    {item.image && (
+                                        <img src={item.image} className="img-fluid rounded-3 mt-3 shadow-sm" alt={item.year} />
+                                    )}
 
-                    <div className="timeline-item right-item clearfix">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                            <span className="badge bg-success year-badge">2023</span>
-                            <h4 className="fw-bold">Відкриття IT-хабу</h4>
-                            <p className="text-muted">Створення сучасного коворкінгу для студентів IT-спеціальностей на базі факультету.</p>
-                            <div className="small text-success fw-semibold"><i className="bi bi-cpu-fill me-1"></i> Технології</div>
-                        </div>
-                    </div>
-
+                                    {item.category && (
+                                        <div className={`small text-${item.badgeColor || 'primary'} fw-semibold`}>
+                                            {item.icon && <i className={`bi ${item.icon} me-1`}></i>}
+                                            {item.category}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </>

@@ -72,7 +72,7 @@ const GalleryPage = () => {
                                         </div>
                                         <div className="card-body">
                                             <h5 className="fw-bold mb-1">Архів: Навчання у 80-х</h5>
-                                            <p className="small text-muted mb-3">Перші комп'ютерні класи факультет</p>
+                                            <p className="small text-muted mb-3">Перші комп'ютерні класи факультету</p>
                                             <button className="btn btn-outline-primary w-100 rounded-pill">Дивитись слайд-шоу</button>
                                         </div>
                                     </div>
