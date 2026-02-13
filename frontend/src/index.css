@@ -1,0 +1,436 @@
+/* Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
+
+body {
+  background-color: #f8f9fa;
+  font-family: 'Inter', sans-serif;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* Navbar */
+.navbar-brand {
+  font-weight: 700;
+  color: #ffc107 !important;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(rgba(0, 45, 90, 0.85), rgba(0, 74, 143, 0.85)),
+    url('https://pnu.edu.ua/wp-content/uploads/2021/01/pnu-main.jpg');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  padding: 120px 0;
+  border-radius: 0 0 50px 50px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Stat Cards */
+.stat-card {
+  background: white;
+  border: none;
+  border-radius: 20px;
+  padding: 30px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  margin-top: -50px;
+}
+
+.stat-card:hover {
+  transform: translateY(-10px);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  color: #ffc107;
+  margin-bottom: 15px;
+}
+
+/* About Section */
+.about-section {
+  padding: 80px 0;
+}
+
+.section-title {
+  font-weight: 700;
+  color: #002d5a;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: #ffc107;
+  border-radius: 2px;
+}
+
+.feature-box {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  height: 100%;
+  border-left: 5px solid #002d5a;
+}
+
+/* Buttons */
+.btn-pnu {
+  background-color: #ffc107;
+  color: #002d5a;
+  font-weight: 700;
+  border-radius: 50px;
+  padding: 12px 35px;
+  transition: all 0.3s;
+  border: none;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-pnu:hover {
+  background-color: #e5ac00;
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+  color: #002d5a;
+}
+
+/* Timeline Page Styles */
+.timeline-header {
+  background: linear-gradient(135deg, #002d5a 0%, #004a8f 100%);
+  color: white;
+  padding: 60px 0;
+  border-radius: 0 0 30px 30px;
+  margin-bottom: 50px;
+}
+
+.timeline-wrapper {
+  position: relative;
+  padding: 40px 0;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  width: 4px;
+  background: #dee2e6;
+  top: 0;
+  bottom: 0;
+  transform: translateX(-50%);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 60px;
+  width: 100%;
+}
+
+.timeline-content {
+  position: relative;
+  width: 45%;
+  padding: 25px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.timeline-content:hover {
+  transform: scale(1.03);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  width: 20px;
+  height: 20px;
+  background: #ffc107;
+  border: 4px solid #002d5a;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.left-item .timeline-content {
+  float: left;
+}
+
+.right-item .timeline-content {
+  float: right;
+}
+
+.timeline-content::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  border-style: solid;
+}
+
+.left-item .timeline-content::after {
+  right: -15px;
+  border-width: 10px 0 10px 15px;
+  border-color: transparent transparent transparent white;
+}
+
+.right-item .timeline-content::after {
+  left: -15px;
+  border-width: 10px 15px 10px 0;
+  border-color: transparent white transparent transparent;
+}
+
+.year-badge {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.filter-section {
+  background: white;
+  border-radius: 50px;
+  padding: 15px 30px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  margin-top: -30px;
+  position: relative;
+  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .timeline-line {
+    left: 30px;
+  }
+
+  .timeline-dot {
+    left: 30px;
+  }
+
+  .timeline-content {
+    width: calc(100% - 70px);
+    float: right !important;
+  }
+
+  .timeline-content::after {
+    left: -15px !important;
+    border-width: 10px 15px 10px 0 !important;
+    border-color: transparent white transparent transparent !important;
+  }
+}
+
+/* Archive Page Styles */
+.archive-header {
+  background: linear-gradient(135deg, #002d5a 0%, #004a8f 100%);
+  color: white;
+  padding: 60px 0;
+  margin-bottom: 40px;
+  border-radius: 0 0 30px 30px;
+}
+
+.archive-container {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.search-box {
+  border-radius: 50px;
+  padding-left: 20px;
+  border: 2px solid #eee;
+  transition: all 0.3s;
+}
+
+.search-box:focus {
+  border-color: #0d6efd;
+  box-shadow: none;
+}
+
+.table {
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.table thead th {
+  border-bottom: none;
+  color: #6c757d;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  padding-left: 20px;
+}
+
+.table tbody tr {
+  background-color: #f8f9fa;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.table tbody tr td {
+  padding: 20px;
+  border: none;
+  vertical-align: middle;
+}
+
+.table tbody tr td:first-child {
+  border-radius: 15px 0 0 15px;
+}
+
+.table tbody tr td:last-child {
+  border-radius: 0 15px 15px 0;
+}
+
+.table tbody tr:hover {
+  transform: scale(1.01);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.category-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 50px;
+}
+
+.cat-official {
+  background: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+}
+
+.cat-science {
+  background: rgba(25, 135, 84, 0.1);
+  color: #218838;
+}
+
+.cat-student {
+  background: rgba(253, 126, 20, 0.1);
+  color: #fd7e14;
+}
+
+.btn-download {
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+/* Gallery Page Styles */
+.gallery-header {
+  background: linear-gradient(135deg, #002d5a 0%, #004a8f 100%);
+  color: white;
+  padding: 60px 0;
+  border-radius: 0 0 30px 30px;
+  margin-bottom: 40px;
+}
+
+.nav-pills .nav-link {
+  color: #002d5a;
+  font-weight: 600;
+  border-radius: 50px;
+  padding: 10px 25px;
+  transition: all 0.3s;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #0d6efd;
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.album-card {
+  border: none;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: white;
+}
+
+.album-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.album-img-wrapper {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.album-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-count {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+}
+
+.video-box {
+  background: white;
+  padding: 15px;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Persons Page Styles */
+.person-card {
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.person-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+}
+
+.profile-img-container {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.profile-img {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.person-card .category-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 6px 15px;
+  border-radius: 50px;
+  font-weight: 600;
+  background: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+}
+
+.card-title {
+  color: #002d5a;
+}
+
+.biography-text {
+  color: #555;
+  line-height: 1.6;
+  min-height: 80px;
+}
