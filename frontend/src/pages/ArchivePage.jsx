@@ -1,6 +1,53 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchArchive } from '../services/api';
 
 const ArchivePage = () => {
+    const [documents, setDocuments] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('Всі категорії');
+
+    useEffect(() => {
+        const loadArchive = async () => {
+            setIsLoading(true);
+            try {
+                const data = await fetchArchive(searchQuery, selectedCategory);
+                setDocuments(data);
+            } catch (err) {
+                setError('Не вдалося завантажити архів документів. Спробуйте пізніше.');
+                console.error('Archive load error:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        const timer = setTimeout(() => {
+            loadArchive();
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery, selectedCategory]);
+
+    if (isLoading) {
+        return (
+            <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Завантаження...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="alert alert-danger text-center m-5" role="alert">
+                {error}
+            </div>
+        );
+    }
+
     return (
         <>
             <header className="archive-header text-center">
@@ -17,15 +64,26 @@ const ArchivePage = () => {
                         <div className="col-lg-6">
                             <div className="input-group">
                                 <span className="input-group-text bg-white border-end-0 search-box"><i className="bi bi-search text-muted"></i></span>
-                                <input type="text" id="archiveSearch" className="form-control border-start-0 search-box" placeholder="Пошук документа за назвою або роком..." />
+                                <input
+                                    type="text"
+                                    id="archiveSearch"
+                                    className="form-control border-start-0 search-box"
+                                    placeholder="Пошук документа за назвою або роком..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
                             </div>
                         </div>
                         <div className="col-lg-3">
-                            <select className="form-select search-box">
-                                <option defaultValue>Всі категорії</option>
-                                <option>Офіційні накази</option>
-                                <option>Наукові звіти</option>
-                                <option>Студентські матеріали</option>
+                            <select
+                                className="form-select search-box"
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                            >
+                                <option>Всі категорії</option>
+                                <option>Офіційне</option>
+                                <option>Наука</option>
+                                <option>Студенти</option>
                             </select>
                         </div>
                         <div className="col-lg-3">
@@ -45,65 +103,27 @@ const ArchivePage = () => {
                                 </tr>
                             </thead>
                             <tbody id="archiveTableBody">
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center">
-                                            <i className="bi bi-file-earmark-pdf-fill text-danger fs-3 me-3"></i>
-                                            <div>
-                                                <div className="fw-bold text-dark">Наказ про заснування факультету</div>
-                                                <div className="small text-muted">Оригінальний відсканований примірник</div>
+                                {documents.map((doc) => (
+                                    <tr key={doc.id}>
+                                        <td>
+                                            <div className="d-flex align-items-center">
+                                                <i className={`${doc.iconClass} fs-3 me-3`}></i>
+                                                <div>
+                                                    <div className="fw-bold text-dark">{doc.title}</div>
+                                                    <div className="small text-muted">{doc.subtitle}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td><span className="category-badge cat-official text-uppercase">Офіційне</span></td>
-                                    <td>1965</td>
-                                    <td><span className="text-muted fw-bold">PDF</span></td>
-                                    <td className="text-end">
-                                        <a href="#" className="btn btn-outline-primary btn-sm btn-download">
-                                            <i className="bi bi-eye me-1"></i> Перегляд
-                                        </a>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center">
-                                            <i className="bi bi-file-earmark-text-fill text-primary fs-3 me-3"></i>
-                                            <div>
-                                                <div className="fw-bold text-dark">Протокол Вченої ради №12</div>
-                                                <div className="small text-muted">Обговорення нових програм навчання</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span className="category-badge cat-science text-uppercase">Наука</span></td>
-                                    <td>1982</td>
-                                    <td><span className="text-muted fw-bold">DOCX</span></td>
-                                    <td className="text-end">
-                                        <a href="#" className="btn btn-outline-primary btn-sm btn-download">
-                                            <i className="bi bi-download me-1"></i> Скачати
-                                        </a>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center">
-                                            <i className="bi bi-file-earmark-image-fill text-success fs-3 me-3"></i>
-                                            <div>
-                                                <div className="fw-bold text-dark">Перший диплом випускника ПНУ</div>
-                                                <div className="small text-muted">Архівний зразок диплома спеціаліста</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span className="category-badge cat-student text-uppercase">Студенти</span></td>
-                                    <td>1970</td>
-                                    <td><span className="text-muted fw-bold">JPG</span></td>
-                                    <td className="text-end">
-                                        <a href="#" className="btn btn-outline-primary btn-sm btn-download">
-                                            <i className="bi bi-eye me-1"></i> Перегляд
-                                        </a>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td><span className={`category-badge ${doc.categoryClass} text-uppercase`}>{doc.category}</span></td>
+                                        <td>{doc.year}</td>
+                                        <td><span className="text-muted fw-bold">{doc.format}</span></td>
+                                        <td className="text-end">
+                                            <a href="#" className="btn btn-outline-primary btn-sm btn-download">
+                                                <i className={`${doc.actionIcon} me-1`}></i> {doc.action}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>

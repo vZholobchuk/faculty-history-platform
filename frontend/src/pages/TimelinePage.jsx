@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { fetchHistory } from '../services/api';
 
 const TimelinePage = () => {
-    const [historyData, setHistoryData] = useState([]); // Renamed to avoid conflict with history object if used later
+    const [historyData, setHistoryData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('Всі категорії');
 
     useEffect(() => {
         const loadHistory = async () => {
+            setIsLoading(true);
             try {
-                const data = await fetchHistory();
+                const data = await fetchHistory(selectedCategory, searchTerm);
                 setHistoryData(data);
                 setIsLoading(false);
             } catch (err) {
@@ -17,8 +20,13 @@ const TimelinePage = () => {
                 setIsLoading(false);
             }
         };
-        loadHistory();
-    }, []);
+        // Debounce search could be added here, but for mock local data frequent updates are fine.
+        const timer = setTimeout(() => {
+            loadHistory();
+        }, 300); // Small debounce to avoid too many "requests" while typing
+
+        return () => clearTimeout(timer);
+    }, [selectedCategory, searchTerm]);
 
     return (
         <>
@@ -34,12 +42,22 @@ const TimelinePage = () => {
                     <div className="col-lg-8">
                         <div className="filter-section d-flex align-items-center gap-3">
                             <i className="bi bi-funnel text-primary fs-4"></i>
-                            <input type="number" className="form-control border-0 bg-light rounded-pill" placeholder="Пошук за роком (напр. 1992)" />
-                            <select className="form-select border-0 bg-light rounded-pill">
+                            <input
+                                type="text"
+                                className="form-control border-0 bg-light rounded-pill"
+                                placeholder="Пошук за роком або назвою..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <select
+                                className="form-select border-0 bg-light rounded-pill"
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                            >
                                 <option>Всі категорії</option>
                                 <option>Освіта</option>
-                                <option>Наука</option>
-                                <option>Студенти</option>
+                                <option>Історія</option>
+                                <option>Технології</option>
                             </select>
                         </div>
                     </div>
