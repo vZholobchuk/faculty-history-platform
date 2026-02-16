@@ -1,0 +1,84 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f7f9;
+}
+.navbar-brand { font-weight: 700; color: #ffc107 !important; }
+
+/* Стиль заголовка сторінки */
+.archive-header {
+    background: linear-gradient(135deg, #002d5a 0%, #004a8f 100%);
+    color: white;
+    padding: 60px 0;
+    margin-bottom: 40px;
+    border-radius: 0 0 30px 30px;
+}
+
+/* Контейнер таблиці */
+.archive-container {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+/* Пошук та фільтри */
+.search-box {
+    border-radius: 50px;
+    padding-left: 20px;
+    border: 2px solid #eee;
+    transition: all 0.3s;
+}
+.search-box:focus {
+    border-color: #0d6efd;
+    box-shadow: none;
+}
+
+/* Стиль таблиці */
+.table {
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+.table thead th {
+    border-bottom: none;
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    padding-left: 20px;
+}
+.table tbody tr {
+    background-color: #f8f9fa;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.table tbody tr td {
+    padding: 20px;
+    border: none;
+    vertical-align: middle;
+}
+.table tbody tr td:first-child { border-radius: 15px 0 0 15px; }
+.table tbody tr td:last-child { border-radius: 0 15px 15px 0; }
+
+.table tbody tr:hover {
+    transform: scale(1.01);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* Бейджі категорій */
+.category-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 50px;
+}
+.cat-official { background: rgba(13, 110, 253, 0.1); color: #0d6efd; }
+.cat-science { background: rgba(25, 135, 84, 0.1); color: #218838; }
+.cat-student { background: rgba(253, 126, 20, 0.1); color: #fd7e14; }
+
+.btn-download {
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s;
+}

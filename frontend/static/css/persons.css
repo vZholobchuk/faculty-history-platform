@@ -1,0 +1,54 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f7f9;
+}
+.navbar-brand { font-weight: 700; color: #ffc107 !important; }
+
+/* Стиль картки */
+.person-card {
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+.person-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+}
+
+/* Стиль фото */
+.profile-img-container {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+.profile-img {
+    width: 130px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+/* Категорія (Badge) у кутку */
+.category-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 6px 15px;
+    border-radius: 50px;
+    font-weight: 600;
+    background: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.card-title { color: #002d5a; }
+.biography-text {
+    color: #555;
+    line-height: 1.6;
+    min-height: 80px;
+}

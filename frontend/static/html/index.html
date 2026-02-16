@@ -1,116 +1,8 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Головна | ПНУ Історія</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9;
-            color: #333;
-        }
-        .navbar-brand { font-weight: 700; color: #ffc107 !important; }
-        
-        /* Hero Section з градієнтом та фото */
-        .hero-section {
-            background: linear-gradient(rgba(0, 45, 90, 0.85), rgba(0, 74, 143, 0.85)), 
-                        url('https://pnu.edu.ua/wp-content/uploads/2021/01/pnu-main.jpg');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 120px 0;
-            border-radius: 0 0 50px 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
+{% extends 'base.html' %}
 
-        /* Картки статистики */
-        .stat-card {
-            background: white;
-            border: none;
-            border-radius: 20px;
-            padding: 30px;
-            transition: transform 0.3s ease;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            margin-top: -50px;
-        }
-        .stat-card:hover {
-            transform: translateY(-10px);
-        }
-        .stat-icon {
-            font-size: 2.5rem;
-            color: #ffc107;
-            margin-bottom: 15px;
-        }
+{% block title %} Головна | ПНУ Історія {% endblock %}    
 
-        /* Секція "Про проект" */
-        .about-section {
-            padding: 80px 0;
-        }
-        .section-title {
-            font-weight: 700;
-            color: #002d5a;
-            position: relative;
-            margin-bottom: 30px;
-        }
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 60px;
-            height: 4px;
-            background: #ffc107;
-            border-radius: 2px;
-        }
-
-        /* Кнопки */
-        .btn-pnu {
-            background-color: #ffc107;
-            color: #002d5a;
-            font-weight: 700;
-            border-radius: 50px;
-            padding: 12px 35px;
-            transition: all 0.3s;
-            border: none;
-        }
-        .btn-pnu:hover {
-            background-color: #e5ac00;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
-        }
-
-        .feature-box {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            height: 100%;
-            border-left: 5px solid #002d5a;
-        }
-    </style>
-</head>
-<body>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">КНУ Історія</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" href="index.html">Головна</a></li>
-                    <li class="nav-item"><a class="nav-link" href="timeline.html">Хронологія</a></li>
-                    <li class="nav-item"><a class="nav-link" href="archive.html">Архів</a></li>
-                    <li class="nav-item"><a class="nav-link" href="gallery.html">Галерея</a></li>
-                    <li class="nav-item"><a class="nav-link" href="persons.html">Постаті</a></li>
-                    <li class="nav-item"><a class="nav-link" href="admin.html">Адмін-панель</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
+{% block content %}
     <header class="hero-section text-center">
         <div class="container">
             <h1 class="display-3 fw-bold mb-3">Цифрова спадщина факультету</h1>
@@ -180,7 +72,9 @@
             </div>
         </div>
     </section>
+{% endblock %}
 
+{% block footer %}
     <footer class="bg-dark text-white text-center py-5">
         <div class="container">
             <div class="row mb-4">
@@ -205,7 +99,4 @@
             <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>
         </div>
     </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,110 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f7f9;
+    overflow-x: hidden;
+}
+.navbar-brand { font-weight: 700; color: #ffc107 !important; }
+
+/* Шапка сторінки */
+.timeline-header {
+    background: linear-gradient(135deg, #002d5a 0%, #004a8f 100%);
+    color: white;
+    padding: 60px 0;
+    border-radius: 0 0 30px 30px;
+    margin-bottom: 50px;
+}
+
+/* Основна лінія хронології */
+.timeline-wrapper {
+    position: relative;
+    padding: 40px 0;
+}
+.timeline-line {
+    position: absolute;
+    left: 50%;
+    width: 4px;
+    background: #dee2e6;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-50%);
+}
+
+/* Картка події */
+.timeline-item {
+    position: relative;
+    margin-bottom: 60px;
+    width: 100%;
+}
+.timeline-content {
+    position: relative;
+    width: 45%;
+    padding: 25px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+}
+.timeline-content:hover {
+    transform: scale(1.03);
+}
+
+/* Точка на лінії */
+.timeline-dot {
+    position: absolute;
+    left: 50%;
+    top: 20px;
+    width: 20px;
+    height: 20px;
+    background: #ffc107;
+    border: 4px solid #002d5a;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+/* Розташування зліва/справа */
+.left-item .timeline-content { float: left; }
+.right-item .timeline-content { float: right; }
+
+/* Стрілочки до лінії */
+.timeline-content::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    border-style: solid;
+}
+.left-item .timeline-content::after {
+    right: -15px;
+    border-width: 10px 0 10px 15px;
+    border-color: transparent transparent transparent white;
+}
+.right-item .timeline-content::after {
+    left: -15px;
+    border-width: 10px 15px 10px 0;
+    border-color: transparent white transparent transparent;
+}
+
+.year-badge {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+/* Фільтри */
+.filter-section {
+    background: white;
+    border-radius: 50px;
+    padding: 15px 30px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-top: -30px;
+    position: relative;
+    z-index: 10;
+}
+
+@media (max-width: 768px) {
+    .timeline-line { left: 30px; }
+    .timeline-dot { left: 30px; }
+    .timeline-content { width: calc(100% - 70px); float: right !important; }
+    .timeline-content::after { left: -15px !important; border-width: 10px 15px 10px 0 !important; border-color: transparent white transparent transparent !important; }
+}

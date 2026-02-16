@@ -5,7 +5,12 @@ import os
 from werkzeug.utils import secure_filename
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder="../frontend/templates",
+    static_folder="../frontend/static"
+)
+
 CORS(app)
 
 app.config['JWT_SECRET_KEY'] = 'super-secret-key-change-me' 
