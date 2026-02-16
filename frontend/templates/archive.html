@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
+
 {% block title %}Цифровий Архів | ПНУ Історія {% endblock %}
+
+{% block links %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/archive.css' )}}">
+{% endblock %}
 
 {% block content %}
 

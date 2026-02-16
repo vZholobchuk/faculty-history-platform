@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
+
 {% block title %}Видатні Постаті | ПНУ Історія{% endblock %}
+
+{% block links %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/person.css') }}">
+{% endblock %}
 
 {% block content %}
     <div class="container my-5">
@@ -89,6 +95,7 @@
         </div>
     </div>
 {% endblock %}
+
 {% block footer %}
     <footer class="bg-dark text-white text-center py-4">
         <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>

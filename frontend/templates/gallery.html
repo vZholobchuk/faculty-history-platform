@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
+
 {% block title %} Медіа-галерея | ПНУ Історія {% endblock %}
+
+{% block links %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
+{% endblock %}
 
 {% block content %}
     <header class="gallery-header text-center">
