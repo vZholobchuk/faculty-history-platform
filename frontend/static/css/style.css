@@ -1,0 +1,27 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 50, 0.7), rgba(0, 0, 50, 0.7)), 
+                url('https://pnu.edu.ua/wp-content/uploads/2021/01/pnu-main.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 100px 0;
+}
+
+.timeline-item {
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+
+.timeline-item:hover {
+    transform: translateX(10px);
+    background-color: #fff9e6 !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: #ffc107 !important;
+}

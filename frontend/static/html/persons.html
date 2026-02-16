@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Видатні Постаті | ПНУ Історія</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+        }
+        .navbar-brand { font-weight: 700; color: #ffc107 !important; }
+        
+        /* Стиль картки */
+        .person-card {
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .person-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+        }
+
+        /* Стиль фото */
+        .profile-img-container {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        .profile-img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        /* Категорія (Badge) у кутку */
+        .category-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-weight: 600;
+            background: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+        }
+
+        .card-title { color: #002d5a; }
+        .biography-text {
+            color: #555;
+            line-height: 1.6;
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">ПНУ Історія</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Головна</a></li>
+                    <li class="nav-item"><a class="nav-link" href="timeline.html">Хронологія</a></li>
+                    <li class="nav-item"><a class="nav-link" href="archive.html">Архів</a></li>
+                    <li class="nav-item"><a class="nav-link" href="gallery.html">Галерея</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="persons.html">Постаті</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin.html">Адмін-панель</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <header class="text-center mb-5">
+            <h1 class="display-5 fw-bold text-dark">Видатні особистості факультету</h1>
+            <p class="text-muted">Люди, які творили історію нашого університету протягом десятиліть</p>
+        </header>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card person-card h-100 shadow-sm">
+                    <span class="category-badge">Історична постать</span>
+                    
+                    <div class="profile-img-container">
+                        <img src="https://stefanyk.pnu.edu.ua/wp-content/uploads/sites/11/2017/03/stefanyk.jpg" class="profile-img" alt="Василь Стефаник">
+                    </div>
+
+                    <div class="card-body text-center">
+                        <h4 class="card-title fw-bold">Василь Стефаник</h4>
+                        <p class="text-primary small mb-3">Класик української літератури</p>
+                        
+                        <p class="biography-text">
+                            Видатний майстер психологічної новели, громадський діяч. Його творчість є фундаментом ідентичності нашого університету, який носить його ім'я з 1992 року.
+                        </p>
+
+                        <div class="text-start bg-light p-3 rounded-3 mb-4">
+                            <div class="small mb-1">📍 <strong>Роки життя:</strong> 1871–1936</div>
+                            <div class="small">📖 <strong>Головна праця:</strong> "Синя книжечка"</div>
+                        </div>
+
+                        <a href="#" class="btn btn-primary w-100 py-2 fw-semibold">Біографічний нарис</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card person-card h-100 shadow-sm">
+                    <span class="category-badge" style="color: #198754; background: rgba(25, 135, 84, 0.1);">Наукова еліта</span>
+                    
+                    <div class="profile-img-container">
+                        <img src="https://via.placeholder.com/150?text=Professor" class="profile-img" alt="Професор">
+                    </div>
+
+                    <div class="card-body text-center">
+                        <h4 class="card-title fw-bold">Професор Іванченко І.І.</h4>
+                        <p class="text-success small mb-3">Засновник кафедри</p>
+                        
+                        <p class="biography-text">
+                            Зробив вагомий внесок у розвиток наукової школи нашого факультету у 80-х роках минулого століття. Опублікував понад 200 наукових статей.
+                        </p>
+
+                        <div class="text-start bg-light p-3 rounded-3 mb-4">
+                            <div class="small mb-1">🏆 <strong>Досягнення:</strong> Заслужений діяч науки</div>
+                            <div class="small">🔬 <strong>Сфера:</strong> Теоретична математика</div>
+                        </div>
+
+                        <a href="#" class="btn btn-outline-success w-100 py-2 fw-semibold">Наукові праці</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card person-card h-100 shadow-sm">
+                    <span class="category-badge" style="color: #fd7e14; background: rgba(253, 126, 20, 0.1);">Сучасна постать</span>
+                    
+                    <div class="profile-img-container">
+                        <img src="https://via.placeholder.com/150?text=IT+Expert" class="profile-img" alt="Сучасник">
+                    </div>
+
+                    <div class="card-body text-center">
+                        <h4 class="card-title fw-bold">Доцент Петренко О.М.</h4>
+                        <p class="text-warning small mb-3">Заслужений викладач</p>
+                        
+                        <p class="biography-text">
+                            Автор понад 100 методичних посібників, за якими навчалися цілі покоління студентів нашого університету. Розробник курсів з архітектури ПЗ.
+                        </p>
+
+                        <div class="text-start bg-light p-3 rounded-3 mb-4">
+                            <div class="small mb-1">👨‍💻 <strong>Спеціалізація:</strong> IT та програмування</div>
+                            <div class="small">🎓 <strong>Стаж:</strong> Понад 35 років викладання</div>
+                        </div>
+
+                        <a href="#" class="btn btn-outline-dark w-100 py-2 fw-semibold">Досягнення</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <p class="mb-0
