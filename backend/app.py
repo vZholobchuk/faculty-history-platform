@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request  
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from models import db, Event, EventPhoto,Person,Document
 import os
@@ -31,7 +31,27 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    return "Faculty History API is working!"
+    return render_template('index.html')
+
+@app.route('/timeline')
+def timeline():
+    return render_template('timeline.html')
+
+@app.route('/gallery')
+def gallery():
+    return render_template('gallery.html')
+
+@app.route('/persons')
+def persons():
+    return render_template('persons.html')
+
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+@app.route('/archive')
+def archive():
+    return render_template('archive.html')
 
 # Оновлений ендпоінт з фільтрацією
 @app.route('/api/events', methods=['GET'])
