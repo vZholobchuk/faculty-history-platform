@@ -1,82 +1,81 @@
-  body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9;
-            color: #333;
-        }
-        .navbar-brand { font-weight: 700; color: #ffc107 !important; }
-        
-        /* Hero Section з градієнтом та фото */
-        .hero-section {
-            background: linear-gradient(rgba(0, 45, 90, 0.85), rgba(0, 74, 143, 0.85)), 
-                        url('https://pnu.edu.ua/wp-content/uploads/2021/01/pnu-main.jpg');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 120px 0;
-            border-radius: 0 0 50px 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
+.header {
+    margin-bottom: 100px;
+}
 
-        /* Картки статистики */
-        .stat-card {
-            background: white;
-            border: none;
-            border-radius: 20px;
-            padding: 30px;
-            transition: transform 0.3s ease;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            margin-top: -50px;
-        }
-        .stat-card:hover {
-            transform: translateY(-10px);
-        }
-        .stat-icon {
-            font-size: 2.5rem;
-            color: #ffc107;
-            margin-bottom: 15px;
-        }
+.stat-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    padding: 50px;
+    transition: transform 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-top: -50px;
+}
+.stat-card:hover {
+    transform: translateY(-10px);
+}
+.stat-icon {
+    font-size: 2.5rem;
+    color: #ffc107;
+    margin-bottom: 15px;
+}
 
-        /* Секція "Про проект" */
-        .about-section {
-            padding: 80px 0;
-        }
-        .section-title {
-            font-weight: 700;
-            color: #002d5a;
-            position: relative;
-            margin-bottom: 30px;
-        }
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 60px;
-            height: 4px;
-            background: #ffc107;
-            border-radius: 2px;
-        }
+/* Секція "Про проект" */
+.about-section {
+    padding: 80px 0;
+}
+.section-title {
+    font-weight: 700;
+    color: #002d5a;
+    position: relative;
+    margin-bottom: 30px;
+}
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: #ffc107;
+    border-radius: 2px;
+}
 
-        /* Кнопки */
-        .btn-pnu {
-            background-color: #ffc107;
-            color: #002d5a;
-            font-weight: 700;
-            border-radius: 50px;
-            padding: 12px 35px;
-            transition: all 0.3s;
-            border: none;
-        }
-        .btn-pnu:hover {
-            background-color: #e5ac00;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
-        }
+/* Кнопки */
+.btn-yellow, .btn-transparent{
+    font-weight: 700;
+    border-radius: 50px;
+    padding: 12px 35px;
+    transition: all 0.3s;
+}
 
-        .feature-box {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            height: 100%;
-            border-left: 5px solid #002d5a;
-        }
+.btn-yellow {
+    background-color: #ffc107;
+    color: #002d5a;
+    border: none;
+}
+.btn-yellow:hover {
+    background-color: #e5ac00;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+}
+
+.btn-transparent {
+    background-color:transparent;
+    color: #f4f7f9;
+    border: 3px solid #f4f7f9;
+}
+.btn-transparent:hover {
+    background-color: #f4f7f9;
+    color: #002d5a;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(224, 247, 249, 0.4);
+}
+
+.feature-box {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    height: 100%;
+    border-left: 5px solid #002d5a;
+}

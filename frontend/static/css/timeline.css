@@ -1,17 +1,5 @@
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f4f7f9;
-    overflow-x: hidden;
-}
-.navbar-brand { font-weight: 700; color: #ffc107 !important; }
-
-/* Шапка сторінки */
-.timeline-header {
-    background: linear-gradient(135deg, #002d5a 0%, #004a8f 100%);
-    color: white;
-    padding: 60px 0;
-    border-radius: 0 0 30px 30px;
-    margin-bottom: 50px;
+.header {
+    margin-bottom: 100px;
 }
 
 /* Основна лінія хронології */
@@ -19,6 +7,7 @@ body {
     position: relative;
     padding: 40px 0;
 }
+
 .timeline-line {
     position: absolute;
     left: 50%;
@@ -32,6 +21,7 @@ body {
 /* Картка події */
 .timeline-item {
     position: relative;
+    cursor: pointer;
     margin-bottom: 60px;
     width: 100%;
 }
@@ -45,7 +35,7 @@ body {
     transition: transform 0.3s ease;
 }
 .timeline-content:hover {
-    transform: scale(1.03);
+    transform: scale(1.05);
 }
 
 /* Точка на лінії */

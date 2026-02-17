@@ -4,16 +4,18 @@
 
 {% block links %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/person.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/persons.css') }}">
 {% endblock %}
 
 {% block content %}
+    <header class="header text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Видатні особистості факультету</h1>
+            <p class="lead opacity-75">Люди, які творили історію нашого університету протягом десятиліть</p>
+        </div>
+    </header>
+    
     <div class="container my-5">
-        <header class="text-center mb-5">
-            <h1 class="display-5 fw-bold text-dark">Видатні особистості факультету</h1>
-            <p class="text-muted">Люди, які творили історію нашого університету протягом десятиліть</p>
-        </header>
-        
         <div class="row g-4">
             <div class="col-lg-4 col-md-6">
                 <div class="card person-card h-100 shadow-sm">
@@ -36,7 +38,7 @@
                             <div class="small">📖 <strong>Головна праця:</strong> "Синя книжечка"</div>
                         </div>
 
-                        <a href="#" class="btn btn-primary w-100 py-2 fw-semibold">Біографічний нарис</a>
+                        <a href="#" class="btn btn-outline-primary w-100 py-2 fw-semibold">Біографічний нарис</a>
                     </div>
                 </div>
             </div>
