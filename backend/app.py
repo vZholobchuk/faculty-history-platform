@@ -35,7 +35,83 @@ def home():
 
 @app.route('/timeline')
 def timeline():
-    return render_template('timeline.html')
+    CATEGORIES = {
+        "education": {
+            "label": "Освіта",
+            "icon": "bi-book-fill",
+        },
+        "science": {
+            "label": "Наука",
+            "icon": "bi-flask-fill",
+        },
+        "students": {
+            "label": "Студенти",
+            "icon": "bi-person-fill",
+        },
+        "tech_innovation": {
+            "label": "Технології та інновації",
+            "icon": "bi-laptop-fill",
+        },
+        "campus_development": {
+            "label": "Розвиток кампусу",
+            "icon": "bi-building-fill",
+        },
+        "culture_social": {
+            "label": "Культурний та соціальний вплив",
+            "icon": "bi-people-fill",
+        },
+        "leadership": {
+            "label": "Лідерство та управління",
+            "icon": "bi-person-lines-fill",
+        },
+        "international": {
+            "label": "Міжнародні відносини",
+            "icon": "bi-globe2",
+        },
+        "community": {
+            "label": "Залучення громади та випускники",
+            "icon": "bi-people-fill",
+        }
+    }
+
+    events = [
+        {
+            "year": 1940, 
+            "title": "Заснування інституту", 
+            "category": "education", 
+            "description": "Утворено Станіславський учительський інститут. Це початкова точка розвитку вищої освіти в нашому регіоні."
+        },
+        {
+            "year": 1991,
+            "title": "Статус університету",
+            "category": "education",
+            "description": "На базі педагогічного інституту створено Прикарпатський університет. Важлива віха в історії закладу."
+        },
+        {
+            "year": 2004,
+            "title": "Національний статус",
+            "category": "science",
+            "description": "Університету присвоєно статус національного за вагомий внесок у розвиток науки та культури України."
+        },
+        {
+            "year": 2023,
+            "title": "Відкриття IT-хабу",
+            "category": "tech_innovation",
+            "description": "Створення сучасного коворкінгу для студентів IT-спеціальностей на базі факультету."
+    }]
+
+    year_filter = request.args.get('year', type=int)
+    category_filter = request.args.get('category')
+
+    filtered_events = events
+
+    if year_filter:
+        filtered_events = [e for e in filtered_events if e['year'] == year_filter]
+
+    if category_filter:
+        filtered_events = [e for e in filtered_events if e['category'] == category_filter]
+
+    return render_template('timeline.html', events=filtered_events, CATEGORIES=CATEGORIES)
 
 @app.route('/gallery')
 def gallery():

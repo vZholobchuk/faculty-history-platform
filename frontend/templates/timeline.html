@@ -16,63 +16,41 @@
     </header>
 
     <div class="container">
-        <div class="row justify-content-center mb-5">
-            <div class="col-lg-8">
-                <div class="filter-section d-flex align-items-center gap-3">
-                    <i class="bi bi-funnel text-primary fs-4"></i>
-                    <input type="number" class="form-control border-0 bg-light rounded-pill" placeholder="Пошук за роком (напр. 1992)">
-                    <select class="form-select border-0 bg-light rounded-pill">
-                        <option>Всі категорії</option>
-                        <option>Освіта</option>
-                        <option>Наука</option>
-                        <option>Студенти</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+        <form method="get" class="filter-section d-flex align-items-center gap-3">
+            <i class="bi bi-funnel text-primary fs-4"></i>
+            
+            <input type="number" name="year" class="form-control border-0 bg-light rounded-pill" 
+                placeholder="Пошук за роком (напр. 1992)" value="{{ request.args.get('year', '') }}">
+            
+            <select name="category" class="form-select border-0 bg-light rounded-pill">
+                <option value="">Всі категорії</option>
+                {% for key, cat in CATEGORIES.items() %}
+                    <option value="{{ key }}" {% if request.args.get('category') == key %}selected{% endif %}>
+                        {{ cat.label }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-primary rounded-pill">Фільтрувати</button>
+        </form>
 
         <div class="timeline-wrapper">
             <div class="timeline-line"></div>
 
-            <div class="timeline-item left-item clearfix">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <span class="badge bg-primary year-badge">1940</span>
-                    <h4 class="fw-bold">Заснування інституту</h4>
-                    <p class="text-muted">Утворено Станіславський учительський інститут. Це початкова точка розвитку вищої освіти в нашому регіоні.</p>
-                    <div class="small text-primary fw-semibold"><i class="bi bi-tag-fill me-1"></i> Освіта</div>
+            {% for event in events %}
+                <div class="timeline-item {% if loop.index % 2 == 0 %} right-item {% else %} left-item {% endif %} clearfix" data-year="{{ event.year }}"  data-category="{{ event.category }}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content"> 
+                        <span class="badge bg-{{ event.category }} year-badge">{{ event.year }}</span>
+                        <h4 class="fw-bold">{{ event.title }}</h4>
+                        <p class="text-muted">{{ event.description }}</p>
+                        <div class="small text-{{ event.category }} fw-semibold">
+                            <i class="bi {{ CATEGORIES[event.category]["icon"] }} me-1"></i> 
+                            {{ CATEGORIES[event.category]["label"] }}
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="timeline-item right-item clearfix">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <span class="badge bg-primary year-badge">1991</span>
-                    <h4 class="fw-bold">Статус університету</h4>
-                    <p class="text-muted">На базі педагогічного інституту створено Прикарпатський університет. Важлива віха в історії закладу.</p>
-                    <img src="https://via.placeholder.com/400x200?text=History+1991" class="img-fluid rounded-3 mt-3 shadow-sm" alt="1991">
-                </div>
-            </div>
-
-            <div class="timeline-item left-item clearfix">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <span class="badge bg-warning text-dark year-badge">2004</span>
-                    <h4 class="fw-bold">Національний статус</h4>
-                    <p class="text-muted">Університету присвоєно статус національного за вагомий внесок у розвиток науки та культури України.</p>
-                </div>
-            </div>
-
-            <div class="timeline-item right-item clearfix">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <span class="badge bg-success year-badge">2023</span>
-                    <h4 class="fw-bold">Відкриття IT-хабу</h4>
-                    <p class="text-muted">Створення сучасного коворкінгу для студентів IT-спеціальностей на базі факультету.</p>
-                    <div class="small text-success fw-semibold"><i class="bi bi-cpu-fill me-1"></i> Технології</div>
-                </div>
-            </div>
-
+            {% endfor %} 
         </div>
     </div>
 
