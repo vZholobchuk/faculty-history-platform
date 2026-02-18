@@ -37,3 +37,16 @@ body {
 .bg-leadership { background-color: #000000; color: #fff; }
 .bg-international { background-color: #e377c2; color: #fff; }
 .bg-community { background-color: #7f7f7f; color: #fff; }
+
+
+.pdf-textcolor { color: #d62728; }
+.doc-textcolor, .docx-textcolor { color: #107fff; }
+.xls-textcolor, .xlsx-textcolor { color: #228b22; }
+.ppt-textcolor, .pptx-textcolor { color: #ff7f0e; }
+.txt-textcolor { color: #8c564b; }
+.csv-textcolor { color: #2ca02c; }
+.jpg-textcolor, .jpeg-textcolor, .png-textcolor, .gif-textcolor { color: #2ca02c; }
+.mp3-textcolor, .wav-textcolor { color: #9467bd; }
+.mp4-textcolor, .mov-textcolor { color: #e377c2; }
+.zip-textcolor, .rar-textcolor { color: #7f7f7f; }
+.default-textcolor { color: #000000; } 
