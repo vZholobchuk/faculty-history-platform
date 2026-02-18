@@ -3,63 +3,343 @@
 {% block title %} Адмін-панель | ПНУ {% endblock %}
 
 {% block links %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="list-group shadow-sm">
-                    <button class="list-group-item list-group-item-action active">Додати подію</button>
-                    <button class="list-group-item list-group-item-action">Завантажити фото/відео</button>
-                    <button class="list-group-item list-group-item-action">Редагувати архів</button>
-                    <button class="list-group-item list-group-item-action text-danger">Видалити запис</button>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- SIDEBAR -->
+        <div class="col-md-2 mb-4">
+            <div class="list-group shadow-sm sticky-top" style="top: 20px;">
+                <button class="list-group-item list-group-item-action active" onclick="showSection('events')">
+                    <i class="bi bi-calendar-event me-2"></i>Події
+                </button>
+                <button class="list-group-item list-group-item-action" onclick="showSection('persons')">
+                    <i class="bi bi-people me-2"></i>Персоналії
+                </button>
+                <button class="list-group-item list-group-item-action" onclick="showSection('photo-gallery')">
+                    <i class="bi bi-images me-2"></i>Фото-галерея
+                </button>
+                <button class="list-group-item list-group-item-action" onclick="showSection('video-gallery')">
+                    <i class="bi bi-camera-video me-2"></i>Відео-галерея
+                </button>
+                <button class="list-group-item list-group-item-action text-danger mt-3" onclick="logout()">
+                    <i class="bi bi-box-arrow-right me-2"></i>Вихід
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="col-md-10">
+
+            <!-- SECTION: EVENTS -->
+            <div id="section-events" class="admin-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Управління подіями</h3>
+                    <button class="btn btn-primary" onclick="openEventModal()">
+                        <i class="bi bi-plus-circle me-2"></i>Додати подію
+                    </button>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Рік</th>
+                                        <th>Назва</th>
+                                        <th>Категорія</th>
+                                        <th>Дії</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="events-table-body">
+                                    <!-- JS populates this -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-9">
-                <div class="card shadow-sm p-4">
-                    <h3>Створення нової картки події</h3>
-                    <hr>
-                    <form>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Дата/Рік</label>
-                                <input type="text" class="form-control" placeholder="напр. 2024">
-                            </div>
-                            <div class="col-md-8 mb-3">
-                                <label class="form-label fw-bold">Назва події</label>
-                                <input type="text" class="form-control" placeholder="Введіть коротку назву">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Опис події</label>
-                            <textarea class="form-control" rows="4"></textarea>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Категорія</label>
-                                <select class="form-select">
-                                    <option>Освіта</option>
-                                    <option>Наука</option>
-                                    <option>Студенти</option>
-                                    <option>Міжнародні проекти</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Завантажити медіа</label>
-                                <input type="file" class="form-control">
-                            </div>
-                        </div>
-                        <div class="mt-3 text-end">
-                            <button type="reset" class="btn btn-secondary me-2">Очистити</button>
-                            <button type="submit" class="btn btn-primary px-5">Опублікувати на сайті</button>
-                        </div>
-                    </form>
+            <!-- SECTION: PERSONS -->
+            <div id="section-persons" class="admin-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Управління персоналіями</h3>
+                    <button class="btn btn-primary" onclick="openPersonModal()">
+                        <i class="bi bi-plus-circle me-2"></i>Додати персону
+                    </button>
                 </div>
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Фото</th>
+                                        <th>Ім'я</th>
+                                        <th>Роль</th>
+                                        <th>Дії</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="persons-table-body">
+                                    <!-- JS populates this -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: PHOTO GALLERY -->
+            <div id="section-photo-gallery" class="admin-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Фото-галерея (Альбоми)</h3>
+                    <button class="btn btn-primary" onclick="openPhotoAlbumModal()">
+                        <i class="bi bi-plus-circle me-2"></i>Створити альбом
+                    </button>
+                </div>
+                <div class="row g-4" id="photo-albums-container">
+                    <!-- JS populates cards here -->
+                </div>
+            </div>
+
+            <!-- SECTION: VIDEO GALLERY -->
+            <div id="section-video-gallery" class="admin-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Відео-галерея (Альбоми)</h3>
+                    <button class="btn btn-primary" onclick="openVideoAlbumModal()">
+                        <i class="bi bi-plus-circle me-2"></i>Створити відео-альбом
+                    </button>
+                </div>
+                <div class="row g-4" id="video-albums-container">
+                    <!-- JS populates cards here -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- LOGIN MODAL -->
+<div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Вхід в Адмін-панель</h5>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label class="form-label">Логін</label>
+                        <input type="text" class="form-control" id="loginUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="loginPassword" required>
+                    </div>
+                    <div class="text-danger mb-3 d-none" id="loginError">Невірний логін або пароль</div>
+                    <button type="submit" class="btn btn-primary w-100">Увійти</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
+
+<!-- EVENT MODAL (Create/Edit) -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalTitle">Подія</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="eventForm">
+                    <input type="hidden" id="eventId"> <!-- Empty for create, ID for edit -->
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Рік</label>
+                            <input type="number" class="form-control" id="eventYear" required>
+                        </div>
+                        <div class="col-md-9 mb-3">
+                            <label class="form-label">Назва</label>
+                            <input type="text" class="form-control" id="eventTitle" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Категорія</label>
+                        <select class="form-select" id="eventCategory">
+                            <option value="education">Освіта</option>
+                            <option value="science">Наука</option>
+                            <option value="students">Студенти</option>
+                            <option value="community">Спільнота</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Короткий опис</label>
+                        <textarea class="form-control" id="eventShortDesc" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Повний опис</label>
+                        <textarea class="form-control" id="eventFullDesc" rows="4"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Обкладинка (URL або завантажити)</label>
+                        <input type="text" class="form-control mb-2" id="eventMediaUrl" placeholder="https://...">
+                        <input type="file" class="form-control" id="eventMediaFile"
+                            onchange="uploadFile(this, 'eventMediaUrl')">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Фото галереї (URL через кому)</label>
+                        <input type="text" class="form-control" id="eventGalleryUrls" placeholder="url1, url2">
+                        <small class="text-muted">Або завантажте кілька фото нижче:</small>
+                        <input type="file" class="form-control" multiple
+                            onchange="uploadMultipleFiles(this, 'eventGalleryUrls')">
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Зберегти</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PERSON MODAL -->
+<div class="modal fade" id="personModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="personModalTitle">Персона</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="personForm">
+                    <input type="hidden" id="personId">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">ПІБ</label>
+                            <input type="text" class="form-control" id="personName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Роль/Посада</label>
+                            <input type="text" class="form-control" id="personRole" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Фото (URL або завантажити)</label>
+                        <input type="text" class="form-control mb-2" id="personPhotoUrl">
+                        <input type="file" class="form-control" onchange="uploadFile(this, 'personPhotoUrl')">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Коротка біографія</label>
+                        <textarea class="form-control" id="personShortBio" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Повна біографія</label>
+                        <textarea class="form-control" id="personFullBio" rows="4"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Роки життя</label>
+                            <input type="text" class="form-control" id="personLifeYears" placeholder="19xx-20xx">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Сфера діяльності</label>
+                            <input type="text" class="form-control" id="personSphere">
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Зберегти</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PHOTO ALBUM MODAL -->
+<div class="modal fade" id="photoAlbumModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Фото Альбом</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="photoAlbumForm">
+                    <div class="mb-3">
+                        <label class="form-label">Назва альбому</label>
+                        <input type="text" class="form-control" id="albumTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Опис</label>
+                        <textarea class="form-control" id="albumDesc" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Обкладинка</label>
+                        <input type="text" class="form-control mb-2" id="albumCoverUrl">
+                        <input type="file" class="form-control" onchange="uploadFile(this, 'albumCoverUrl')">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Фото (завантажити багато)</label>
+                        <input type="file" class="form-control" multiple
+                            onchange="uploadMultipleFiles(this, 'albumPhotosUrls')">
+                        <input type="hidden" id="albumPhotosUrls"> <!-- Stores comma separated URLs -->
+                        <div id="albumPhotosPreview" class="d-flex flex-wrap mt-2 gap-2"></div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Створити Альбом</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VIDEO ALBUM MODAL -->
+<div class="modal fade" id="videoAlbumModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Відео Альбом</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="videoAlbumForm">
+                    <div class="mb-3">
+                        <label class="form-label">Назва альбому</label>
+                        <input type="text" class="form-control" id="videoAlbumTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Опис</label>
+                        <textarea class="form-control" id="videoAlbumDesc" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Обкладинка</label>
+                        <input type="text" class="form-control mb-2" id="videoAlbumCoverUrl">
+                        <input type="file" class="form-control" onchange="uploadFile(this, 'videoAlbumCoverUrl')">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Відео (URL YouTube через кому)</label>
+                        <textarea class="form-control" id="videoAlbumUrls" rows="3"
+                            placeholder="https://youtube.com/..., https://youtube.com/..."></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Створити Відео-альбом</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ person.name }} | ПНУ Історія {% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('persons') }}">Видатні постаті</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ person.name }}</li>
+                </ol>
+            </nav>
+
+            <article class="card shadow-lg border-0 rounded-4 overflow-hidden mt-4">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-4 mb-md-0">
+                            {% if person.photo_url %}
+                            <img src="{{ person.photo_url }}" class="img-fluid rounded-circle shadow mb-3"
+                                style="width: 200px; height: 200px; object-fit: cover;" alt="{{ person.name }}">
+                            {% else %}
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                                style="width: 200px; height: 200px;">
+                                <i class="bi bi-person-fill text-secondary display-1"></i>
+                            </div>
+                            {% endif %}
+
+                            <h5 class="fw-bold text-muted">{{ person.role }}</h5>
+                            {% if person.life_years %}
+                            <p class="text-secondary small"><i class="bi bi-calendar-event me-1"></i> {{
+                                person.life_years }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-8">
+                            <h1 class="display-5 fw-bold mb-4">{{ person.name }}</h1>
+
+                            <div class="bg-light p-3 rounded-3 mb-4">
+                                <div class="row g-2">
+                                    {% if person.faculty %}
+                                    <div class="col-12">
+                                        <strong><i class="bi bi-mortarboard-fill me-2 text-primary"></i>Факультет /
+                                            Спеціальність:</strong>
+                                        <span class="d-block ms-4 text-muted">{{ person.faculty }}</span>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if person.profession_sphere %}
+                                    <div class="col-12 mt-2">
+                                        <strong><i class="bi bi-briefcase-fill me-2 text-success"></i>Сфера
+                                            діяльності:</strong>
+                                        <span class="d-block ms-4 text-muted">{{ person.profession_sphere }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <h3 class="h4 fw-bold mt-4 mb-3">Біографія та діяльність</h3>
+                            <div class="lead text-secondary" style="line-height: 1.8;">
+                                {{ person.full_bio if person.full_bio else person.short_bio }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <div class="mt-5 text-center">
+                <a href="{{ url_for('persons') }}" class="btn btn-outline-primary rounded-pill px-4">
+                    <i class="bi bi-arrow-left me-2"></i>Повернутися до списку
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

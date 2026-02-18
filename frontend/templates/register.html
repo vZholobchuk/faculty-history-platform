@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %} Реєстрація | ПНУ Історія {% endblock %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">Реєстрація</h2>
+            <p class="text-muted">Для нових адміністраторів</p>
+        </div>
+
+        <form id="registerForm">
+            <div class="mb-3">
+                <label class="form-label">Новий Логін</label>
+                <input type="text" class="form-control" id="regUsername" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Пароль</label>
+                <input type="password" class="form-control" id="regPassword" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Секретний Код Адміністратора</label>
+                <input type="password" class="form-control" id="regSecret" placeholder="Введіть код від деканату"
+                    required>
+                <div class="form-text">Цей код необхідний для підтвердження прав.</div>
+            </div>
+
+            <div class="alert alert-danger d-none" id="regError">Помилка реєстрації. Перевірте секретний код.</div>
+            <div class="alert alert-success d-none" id="regSuccess">Успішно! Перенаправлення на вхід...</div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2">Створити акаунт</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="{{ url_for('login_page') }}" class="small">Вже є акаунт? Увійти</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('regUsername').value;
+        const password = document.getElementById('regPassword').value;
+        const secret = document.getElementById('regSecret').value;
+
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, secret_code: secret })
+            });
+
+            if (response.ok) {
+                document.getElementById('regSuccess').classList.remove('d-none');
+                document.getElementById('regError').classList.add('d-none');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            } else {
+                const data = await response.json();
+                document.getElementById('regError').textContent = data.msg || 'Помилка реєстрації';
+                document.getElementById('regError').classList.remove('d-none');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
+</script>
+{% endblock %}

@@ -3,106 +3,283 @@
 {% block title %} Медіа-галерея | ПНУ Історія {% endblock %}
 
 {% block links %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
 {% endblock %}
 
 {% block content %}
-    <header class="header text-center">
-        <div class="container">
-            <h1 class="display-4 fw-bold">Медіа-архів факультету</h1>
-            <p class="lead opacity-75">Фото та відео звіти з життя університету крізь об'єктив камери</p>
-        </div>
-    </header>
+<header class="header text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Медіа-архів факультету</h1>
+        <p class="lead opacity-75">Фото та відео звіти з життя університету крізь об'єктив камери</p>
+    </div>
+</header>
 
-    <div class="container mb-5">
-        <ul class="nav nav-pills justify-content-center mb-5" id="galleryTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="photos-tab" data-bs-toggle="pill" data-bs-target="#photos" type="button">Фотоальбоми</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="videos-tab" data-bs-toggle="pill" data-bs-target="#videos" type="button">Відео подій</button>
-            </li>
-        </ul>
+<div class="container mb-5">
+    <ul class="nav nav-pills justify-content-center mb-5" id="galleryTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="photos-tab" data-bs-toggle="pill" data-bs-target="#photos"
+                type="button">Фотоальбоми</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="videos-tab" data-bs-toggle="pill" data-bs-target="#videos" type="button">Відео
+                подій</button>
+        </li>
+    </ul>
 
-        <div class="tab-content" id="galleryTabContent">
-            <div class="tab-pane fade show active" id="photos" role="tabpanel">
-                <div class="row g-4">
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card album-card shadow-sm">
-                            <div class="album-img-wrapper">
-                                <img src="https://pnu.edu.ua/wp-content/uploads/2023/05/DSC0987.jpg" alt="Конференція 2023">
-                                <span class="photo-count"><i class="bi bi-camera me-1"></i> 15 фото</span>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="fw-bold mb-1">Наукова конференція 2023</h5>
-                                <p class="small text-muted mb-3">Зустріч молодих вчених факультету</p>
-                                <button class="btn btn-outline-primary w-100 rounded-pill">Дивитись слайд-шоу</button>
+    <div class="tab-content" id="galleryTabContent">
+        <!-- Вкладка ФОТО -->
+        <div class="tab-pane fade show active" id="photos" role="tabpanel">
+            <div class="row g-4">
+                {% if not albums %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-images display-1 text-muted opacity-25"></i>
+                    <p class="mt-3 text-muted">Поки що немає альбомів.</p>
+                </div>
+                {% else %}
+                {% for album in albums %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card album-card shadow-sm h-100">
+                        <div class="album-img-wrapper pointer-cursor" data-bs-toggle="modal"
+                            data-bs-target="#slideshowModal{{ album.id }}">
+                            <img src="{{ album.cover_url }}" alt="{{ album.title }}">
+                            <span class="photo-count"><i class="bi bi-camera me-1"></i> {{ album.photos|length }}
+                                фото</span>
+
+                            <!-- Overlay with icon -->
+                            <div class="album-overlay d-flex align-items-center justify-content-center">
+                                <i class="bi bi-play-circle text-white display-4"></i>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card album-card shadow-sm">
-                            <div class="album-img-wrapper">
-                                <img src="https://via.placeholder.com/400x300?text=Graduation+2020" alt="Випуск 2020">
-                                <span class="photo-count"><i class="bi bi-camera me-1"></i> 42 фото</span>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="fw-bold mb-1">Випуск магістрів 2020</h5>
-                                <p class="small text-muted mb-3">Урочиста церемонія в головному корпусі</p>
-                                <button class="btn btn-outline-primary w-100 rounded-pill">Дивитись слайд-шоу</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card album-card shadow-sm">
-                            <div class="album-img-wrapper">
-                                <img src="https://pnu.edu.ua/wp-content/uploads/2019/02/DSC04250.jpg" alt="Архів 1980">
-                                <span class="photo-count"><i class="bi bi-camera me-1"></i> 8 фото</span>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="fw-bold mb-1">Архів: Навчання у 80-х</h5>
-                                <p class="small text-muted mb-3">Перші комп'ютерні класи факультету</p>
-                                <button class="btn btn-outline-primary w-100 rounded-pill">Дивитись слайд-шоу</button>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="fw-bold mb-1">{{ album.title }}</h5>
+                            <p class="small text-secondary mb-3 flex-grow-1 text-truncate-2">{{ album.description }}</p>
+
+                            <div class="mt-auto row g-2">
+                                <div class="col-6">
+                                    <button class="btn btn-primary w-100 rounded-pill btn-sm py-2"
+                                        data-bs-toggle="modal" data-bs-target="#slideshowModal{{ album.id }}">
+                                        <i class="bi bi-play-circle me-1"></i>Слайд-шоу
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button class="btn btn-outline-secondary w-100 rounded-pill btn-sm py-2"
+                                        data-bs-toggle="modal" data-bs-target="#gridModal{{ album.id }}">
+                                        <i class="bi bi-grid-3x3-gap me-1"></i>Всі фото
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- 1. SLIDESHOW MODAL -->
+                <div class="modal fade" id="slideshowModal{{ album.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-fullscreen">
+                        <div class="modal-content bg-black text-white">
+                            <div class="modal-header border-0 bg-transparent absolute-top w-100" style="z-index: 1050;">
+                                <h5 class="modal-title text-shadow ps-3">{{ album.title }}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div
+                                class="modal-body p-0 d-flex align-items-center justify-content-center position-relative">
+
+                                <div id="carousel{{ album.id }}" class="carousel slide w-100 h-100"
+                                    data-bs-ride="carousel">
+                                    <div class="carousel-inner h-100">
+                                        {% for photo in album.photos %}
+                                        <div class="carousel-item h-100 {% if loop.first %}active{% endif %}"
+                                            data-bs-interval="4000">
+                                            <div class="d-flex align-items-center justify-content-center h-100">
+                                                <img src="{{ photo.url }}"
+                                                    class="d-block mh-100 mw-100 object-fit-contain"
+                                                    alt="Photo {{ loop.index }}">
+                                            </div>
+                                            <div
+                                                class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 py-2 px-3 mb-4">
+                                                <p class="mb-0">{{ loop.index }} / {{ album.photos|length }}</p>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <button class="carousel-control-prev" type="button"
+                                        data-bs-target="#carousel{{ album.id }}" data-bs-slide="prev">
+                                        <span
+                                            class="carousel-control-prev-icon p-4 bg-dark bg-opacity-50 rounded-circle"
+                                            aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button"
+                                        data-bs-target="#carousel{{ album.id }}" data-bs-slide="next">
+                                        <span
+                                            class="carousel-control-next-icon p-4 bg-dark bg-opacity-50 rounded-circle"
+                                            aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. GRID MODAL -->
+                <div class="modal fade" id="gridModal{{ album.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title fw-bold">{{ album.title }} ({{ album.photos|length }} фото)</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body bg-light">
+                                <div class="row g-2">
+                                    {% for photo in album.photos %}
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div class="ratio ratio-1x1 position-relative group-hover cursor-pointer shadow-sm rounded overflow-hidden"
+                                            onclick="openSlideshowFromGrid('{{ album.id }}', '{{ loop.index0 }}')">
+                                            <img src="{{ photo.url }}"
+                                                class="object-fit-cover w-100 h-100 hover-zoom transition-all"
+                                                alt="Grid Photo">
+                                            <div
+                                                class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-black bg-opacity-25 opacity-0 hover-opacity-100 transition-all">
+                                                <i class="bi bi-arrows-fullscreen text-white fs-4"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#slideshowModal{{ album.id }}">
+                                    <i class="bi bi-play-circle me-1"></i>Запустити Слайд-шоу
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% endfor %}
+                {% endif %}
             </div>
+        </div>
 
-            <div class="tab-pane fade" id="videos" role="tabpanel">
-                <div class="row g-4">
-                    <div class="col-lg-6">
-                        <div class="video-box h-100">
-                            <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm">
-                                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Університет ПНУ" allowfullscreen></iframe>
-                            </div>
-                            <div class="p-3">
-                                <h5 class="fw-bold">Гімн та історія Університету</h5>
-                                <p class="small text-muted">Офіційне представлення ПНУ імені Василя Стефаника.</p>
+        <!-- Вкладка ВІДЕО -->
+        <div class="tab-pane fade" id="videos" role="tabpanel">
+            <div class="row g-4">
+                {% if not video_albums %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-camera-video display-1 text-muted opacity-25"></i>
+                    <p class="mt-3 text-muted">Поки що немає відео подій.</p>
+                </div>
+                {% else %}
+                {% for album in video_albums %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card album-card shadow-sm h-100">
+                        <div class="album-img-wrapper pointer-cursor" data-bs-toggle="modal"
+                            data-bs-target="#videoModal{{ album.id }}">
+                            <img src="{{ album.cover_url }}" alt="{{ album.title }}">
+                            <span class="photo-count"><i class="bi bi-play-fill me-1"></i> {{ album.videos|length }}
+                                відео</span>
+
+                            <!-- Overlay with icon -->
+                            <div class="album-overlay d-flex align-items-center justify-content-center">
+                                <i class="bi bi-play-circle text-white display-4"></i>
                             </div>
                         </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="fw-bold mb-1">{{ album.title }}</h5>
+                            <p class="small text-secondary mb-3 flex-grow-1 text-truncate-2">{{ album.description
+                                }}</p>
+
+                            <button class="btn btn-outline-danger w-100 rounded-pill mt-auto" data-bs-toggle="modal"
+                                data-bs-target="#videoModal{{ album.id }}">
+                                <i class="bi bi-play-circle me-2"></i>Дивитись відео
+                            </button>
+                        </div>
                     </div>
-                    <div class="col-lg-6">
-                        <div class="video-box h-100">
-                            <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm">
-                                <iframe src="https://www.youtube.com/embed/L_jWHffIx5E" title="IT Life" allowfullscreen></iframe>
+                </div>
+
+                <!-- VIDEO MODAL (Grid view only, no slideshow) -->
+                <div class="modal fade" id="videoModal{{ album.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title fw-bold">{{ album.title }} - Відео ({{ album.videos|length }})
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
-                            <div class="p-3">
-                                <h5 class="fw-bold">Студентське життя в IT-хабі</h5>
-                                <p class="small text-muted">Як проходять будні майбутніх програмістів на нашому факультеті.</p>
+                            <div class="modal-body bg-light">
+                                <div class="row g-4">
+                                    {% for video in album.videos %}
+                                    <div class="col-md-6">
+                                        <div class="video-box h-100 shadow-sm rounded overflow-hidden bg-white">
+                                            <div class="ratio ratio-16x9">
+                                                {% if 'youtube.com' in video.video_url or 'youtu.be' in video.video_url
+                                                %}
+                                                {% set video_id = video.video_url.split('v=')[-1] if 'v=' in
+                                                video.video_url else video.video_url.split('/')[-1] %}
+                                                <iframe src="https://www.youtube.com/embed/{{ video_id }}"
+                                                    title="YouTube video player" allowfullscreen></iframe>
+                                                {% else %}
+                                                <video controls class="w-100 h-100">
+                                                    <source src="{{ video.video_url }}" type="video/mp4">
+                                                    Ваш браузер не підтримує відео.
+                                                </video>
+                                                {% endif %}
+                                            </div>
+                                            {% if video.caption %}
+                                            <div class="p-3">
+                                                <p class="text-center text-muted mb-0 small">{{ video.caption }}</p>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>
+</div>
+
+<!-- Script to handle switching from Grid to Slideshow -->
+<script>
+    function openSlideshowFromGrid(albumId, slideIndex) {
+        // Close the Grid Modal
+        var gridModalEl = document.getElementById('gridModal' + albumId);
+        var gridModal = bootstrap.Modal.getInstance(gridModalEl);
+        gridModal.hide();
+
+        // Open the Slideshow Modal
+        var slideshowModalEl = document.getElementById('slideshowModal' + albumId);
+        var slideshowModal = new bootstrap.Modal(slideshowModalEl);
+        slideshowModal.show();
+
+        // Move carousel to specific slide
+        var carouselEl = document.getElementById('carousel' + albumId);
+        var carousel = bootstrap.Carousel.getOrCreateInstance(carouselEl);
+        carousel.to(slideIndex);
+    }
+</script>
 
 {% endblock %}
 
 {% block footer %}
-    <footer class="bg-dark text-white text-center py-4">
-        <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>
-    </footer>
+<footer class="bg-dark text-white text-center py-4">
+    <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>
+</footer>
 {% endblock %}

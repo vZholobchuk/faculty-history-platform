@@ -3,103 +3,66 @@
 {% block title %}Видатні Постаті | ПНУ Історія{% endblock %}
 
 {% block links %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/persons.css') }}">
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/persons.css') }}">
 {% endblock %}
 
 {% block content %}
-    <header class="header text-center">
-        <div class="container">
-            <h1 class="display-4 fw-bold">Видатні особистості факультету</h1>
-            <p class="lead opacity-75">Люди, які творили історію нашого університету протягом десятиліть</p>
-        </div>
-    </header>
-    
-    <div class="container my-5">
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="card person-card h-100 shadow-sm">
-                    <span class="category-badge">Історична постать</span>
-                    
-                    <div class="profile-img-container">
-                        <img src="https://stefanyk.pnu.edu.ua/wp-content/uploads/sites/11/2017/03/stefanyk.jpg" class="profile-img" alt="Василь Стефаник">
-                    </div>
-
-                    <div class="card-body text-center">
-                        <h4 class="card-title fw-bold">Василь Стефаник</h4>
-                        <p class="text-primary small mb-3">Класик української літератури</p>
-                        
-                        <p class="biography-text">
-                            Видатний майстер психологічної новели, громадський діяч. Його творчість є фундаментом ідентичності нашого університету, який носить його ім'я з 1992 року.
-                        </p>
-
-                        <div class="text-start bg-light p-3 rounded-3 mb-4">
-                            <div class="small mb-1">📍 <strong>Роки життя:</strong> 1871–1936</div>
-                            <div class="small">📖 <strong>Головна праця:</strong> "Синя книжечка"</div>
-                        </div>
-
-                        <a href="#" class="btn btn-outline-primary w-100 py-2 fw-semibold">Біографічний нарис</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="card person-card h-100 shadow-sm">
-                    <span class="category-badge" style="color: #198754; background: rgba(25, 135, 84, 0.1);">Наукова еліта</span>
-                    
-                    <div class="profile-img-container">
-                        <img src="https://via.placeholder.com/150?text=Professor" class="profile-img" alt="Професор">
-                    </div>
-
-                    <div class="card-body text-center">
-                        <h4 class="card-title fw-bold">Професор Іванченко І.І.</h4>
-                        <p class="text-success small mb-3">Засновник кафедри</p>
-                        
-                        <p class="biography-text">
-                            Зробив вагомий внесок у розвиток наукової школи нашого факультету у 80-х роках минулого століття. Опублікував понад 200 наукових статей.
-                        </p>
-
-                        <div class="text-start bg-light p-3 rounded-3 mb-4">
-                            <div class="small mb-1">🏆 <strong>Досягнення:</strong> Заслужений діяч науки</div>
-                            <div class="small">🔬 <strong>Сфера:</strong> Теоретична математика</div>
-                        </div>
-
-                        <a href="#" class="btn btn-outline-success w-100 py-2 fw-semibold">Наукові праці</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="card person-card h-100 shadow-sm">
-                    <span class="category-badge" style="color: #fd7e14; background: rgba(253, 126, 20, 0.1);">Сучасна постать</span>
-                    
-                    <div class="profile-img-container">
-                        <img src="https://via.placeholder.com/150?text=IT+Expert" class="profile-img" alt="Сучасник">
-                    </div>
-
-                    <div class="card-body text-center">
-                        <h4 class="card-title fw-bold">Доцент Петренко О.М.</h4>
-                        <p class="text-warning small mb-3">Заслужений викладач</p>
-                        
-                        <p class="biography-text">
-                            Автор понад 100 методичних посібників, за якими навчалися цілі покоління студентів нашого університету. Розробник курсів з архітектури ПЗ.
-                        </p>
-
-                        <div class="text-start bg-light p-3 rounded-3 mb-4">
-                            <div class="small mb-1">👨‍💻 <strong>Спеціалізація:</strong> IT та програмування</div>
-                            <div class="small">🎓 <strong>Стаж:</strong> Понад 35 років викладання</div>
-                        </div>
-
-                        <a href="#" class="btn btn-outline-dark w-100 py-2 fw-semibold">Досягнення</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+<header class="header text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Видатні особистості факультету</h1>
+        <p class="lead opacity-75">Люди, які творили історію нашого університету протягом десятиліть</p>
     </div>
+</header>
+
+<div class="container my-5">
+    <div class="row g-4">
+        {% for person in persons %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card person-card h-100 shadow-sm">
+                <span class="category-badge">{{ person.role.split(' ')[0] }}</span>
+
+                <div class="profile-img-container">
+                    {% if person.photo_url %}
+                    <img src="{{ person.photo_url }}" class="profile-img" alt="{{ person.name }}">
+                    {% else %}
+                    <div class="profile-img d-flex align-items-center justify-content-center bg-light">
+                        <i class="bi bi-person-fill text-secondary display-1"></i>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body text-center d-flex flex-column">
+                    <h4 class="card-title fw-bold">{{ person.name }}</h4>
+                    <p class="text-primary small mb-3">{{ person.role }}</p>
+
+                    <p class="biography-text text-truncate-3">
+                        {{ person.short_bio }}
+                    </p>
+
+                    <div class="mt-auto">
+                        {% if person.life_years %}
+                        <div class="text-start bg-light p-3 rounded-3 mb-4">
+                            <div class="small mb-1">📍 <strong>Роки життя:</strong> {{ person.life_years }}</div>
+                            {% if person.profession_sphere %}
+                            <div class="small">🔬 <strong>Сфера:</strong> {{ person.profession_sphere }}</div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <a href="{{ url_for('person_detail', id=person.id) }}"
+                            class="btn btn-outline-primary w-100 py-2 fw-semibold">Детальніше</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
 
 {% block footer %}
-    <footer class="bg-dark text-white text-center py-4">
-        <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>
-    </footer>
+<footer class="bg-dark text-white text-center py-4 mt-5">
+    <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>
+</footer>
 {% endblock %}

@@ -8,7 +8,7 @@
 
 .person-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Стиль фото */
@@ -17,13 +17,14 @@
     display: flex;
     justify-content: center;
 }
+
 .profile-img {
     width: 130px;
     height: 130px;
     object-fit: cover;
     border-radius: 50%;
     border: 4px solid #fff;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 }
 
 /* Категорія (Badge) у кутку */
@@ -41,9 +42,21 @@
     color: #0d6efd;
 }
 
-.card-title { color: #002d5a; }
+.card-title {
+    color: #002d5a;
+}
+
 .biography-text {
     color: #555;
     line-height: 1.6;
     min-height: 80px;
+}
+
+/* New truncation class */
+.text-truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }

@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="uk">
+
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}КНУ{% endblock %}</title>
 
-    {% block links %} 
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block links %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% endblock %}
 </head>
+
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
@@ -18,22 +20,34 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'home' %} active {% endif %}" href="{{url_for('home')}}">Головна</a>
+                        <a class="nav-link {% if request.endpoint == 'home' %} active {% endif %}"
+                            href="{{url_for('home')}}">Головна</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'timeline' %} active {% endif %}" href="{{url_for('timeline')}}">Хронологія</a>
+                        <a class="nav-link {% if request.endpoint == 'timeline' %} active {% endif %}"
+                            href="{{url_for('timeline')}}">Хронологія</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'archive' %} active {% endif %}" href="{{url_for('archive')}}">Архів</a>
+                        <a class="nav-link {% if request.endpoint == 'archive' %} active {% endif %}"
+                            href="{{url_for('archive')}}">Архів</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'gallery' %} active {% endif %}" href="{{url_for('gallery')}}">Галерея</a>
+                        <a class="nav-link {% if request.endpoint == 'gallery' %} active {% endif %}"
+                            href="{{url_for('gallery')}}">Галерея</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'persons' %} active {% endif %}" href="{{url_for('persons')}}">Постаті</a>
+                        <a class="nav-link {% if request.endpoint == 'persons' %} active {% endif %}"
+                            href="{{url_for('persons')}}">Постаті</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'admin' %} active {% endif %}" href="{{url_for('admin')}}">Адмін-панель</a>
+
+                    <li class="nav-item d-none" id="nav-login">
+                        <a class="nav-link {% if request.endpoint == 'login_page' %} active {% endif %}"
+                            href="{{url_for('login_page')}}">Вхід</a>
+                    </li>
+
+                    <li class="nav-item d-none" id="nav-admin">
+                        <a class="nav-link {% if request.endpoint == 'admin' %} active {% endif %}"
+                            href="{{url_for('admin')}}">Адмін-панель</a>
                     </li>
                 </ul>
             </div>
@@ -45,5 +59,21 @@
     {% block footer %}{% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = localStorage.getItem('access_token');
+            const loginLink = document.getElementById('nav-login');
+            const adminLink = document.getElementById('nav-admin');
+
+            if (token) {
+                // User is likely logged in
+                adminLink.classList.remove('d-none');
+            } else {
+                // User is guest
+                loginLink.classList.remove('d-none');
+            }
+        });
+    </script>
 </body>
+
 </html>
