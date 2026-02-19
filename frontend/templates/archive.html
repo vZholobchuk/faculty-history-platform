@@ -17,25 +17,37 @@
 
     <div class="container mb-5">
         <div class="archive-container">
-            <div class="row mb-4 g-3">
-                <div class="col-lg-6">
+            <form class="row mb-4 g-3" method="get">
+                <!-- Search field -->
+                <div class="col-lg-5">
                     <div class="input-group search-box">
                         <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" id="archiveSearch" class="form-control border-0" placeholder="Пошук документа за назвою або роком...">
+                        <input type="text" name="search" value="{{ query }}" class="form-control border-0" placeholder="Пошук документа за назвою або описом...">
                     </div>
                 </div>
+
+                <!-- Year field -->
+                <div class="col-lg-2">
+                    <div class="input-group search-box">
+                        <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="number" name="year" value="{{ selected_year }}" class="form-control border-0" placeholder="Рік">
+                    </div>
+                </div>
+                
+                <!-- Categories -->
                 <div class="col-lg-3">
-                    <select class="form-select search-box">
-                        <option selected>Всі категорії</option>
-                        <option>Офіційні накази</option>
-                        <option>Наукові звіти</option>
-                        <option>Студентські матеріали</option>
+                    <select name=category class="form-select search-box">
+                        <option value="">Всі категорії</option>
+                        {% for key, cat in CATEGORIES.items() %}
+                            <option value="{{ key }}" {% if key == selected_category %}selected{% endif %}> {{ cat.label }} </option>
+                        {% endfor %}
                     </select>
                 </div>
-                <div class="col-lg-3">
+
+                <div class="col-lg-2">
                     <button class="btn btn-primary w-100 search-box fw-bold"><i class="bi bi-funnel me-2"></i> Фільтрувати</button>
                 </div>
-            </div>
+            </form>
 
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -48,99 +60,87 @@
                             <th scope="col" class="text-end">Дія</th>
                         </tr>
                     </thead>
+
                     <tbody id="archiveTableBody">
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-file-earmark-pdf-fill text-danger fs-3 me-3"></i>
-                                    <div>
-                                        <div class="fw-bold text-dark">Наказ про заснування факультету</div>
-                                        <div class="small text-muted">Оригінальний відсканований примірник</div>
+                        {% for arch in archive %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% set type_data = FILE_TYPES.get(arch.file_type.lower(), FILE_TYPES["default"]) %}
+                                        <i class="bi {{ type_data.icon }} {{ arch.file_type }}-textcolor fs-3 me-3">
+                                        </i>
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ arch.title }}</div>
+                                            <div class="small text-muted">{{ arch.subtitle }}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td><span class="category-badge cat-official text-uppercase">Офіційне</span></td>
-                            <td>1965</td>
-                            <td><span class="text-muted fw-bold">PDF</span></td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-outline-primary btn-sm btn-download">
-                                    <i class="bi bi-eye me-1"></i> Перегляд
-                                </a>
-                            </td>
-                        </tr>
+                                </td>
 
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-file-earmark-text-fill text-primary fs-3 me-3"></i>
-                                    <div>
-                                        <div class="fw-bold text-dark">Протокол Вченої ради №12</div>
-                                        <div class="small text-muted">Обговорення нових програм навчання</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="category-badge cat-science text-uppercase">Наука</span></td>
-                            <td>1982</td>
-                            <td><span class="text-muted fw-bold">DOCX</span></td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-outline-primary btn-sm btn-download">
-                                    <i class="bi bi-download me-1"></i> Скачати
-                                </a>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-file-earmark-image-fill text-success fs-3 me-3"></i>
-                                    <div>
-                                        <div class="fw-bold text-dark">Перший диплом випускника ПНУ</div>
-                                        <div class="small text-muted">Архівний зразок диплома спеціаліста</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="category-badge cat-student text-uppercase">Студенти</span></td>
-                            <td>1970</td>
-                            <td><span class="text-muted fw-bold">JPG</span></td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-outline-primary btn-sm btn-download">
-                                    <i class="bi bi-eye me-1"></i> Перегляд
-                                </a>
-                            </td>
-                        </tr>
+                                <td><span class="category-badge cat-official text-uppercase">{{ CATEGORIES[arch.category]["label"] }}</span></td>
+                                
+                                <td>{{ arch.year }}</td>
+                                
+                                <td><span class="text-muted fw-bold">{{ arch.file_type.upper() }}</span></td>
+                                
+                                <td class="text-end">
+                                    <a href="{{ arch.file_url }}" class="btn btn-outline-primary btn-sm btn-download">
+                                        <i class="bi {{ type_data.btn_icon }} me-1"></i> {{ type_data.btn_title }}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
 
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
-                    <li class="page-item disabled"><a class="page-link rounded-circle me-2" href="#"><i class="bi bi-chevron-left"></i></a></li>
-                    <li class="page-item active"><a class="page-link rounded-circle me-2" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link rounded-circle me-2" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link rounded-circle" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                    <!-- Back button -->
+                    <li class="page-item {% if current_page == 1 %} disabled {% endif %}">
+                        <a class="page-link rounded-circle me-2" 
+                            href="{{ url_for('archive',
+                                        page = current_page - 1,
+                                        search=query,
+                                        category=selected_category,
+                                        year=selected_year)}}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    
+                    <!-- Pages button -->
+                    {% for p in range (1, total_pages + 1) %}
+                        <li class="page-item {% if current_page == p %} active {% endif %}">
+                            <a class="page-link rounded-circle me-2" 
+                                href="{{ url_for('archive',
+                                        page = p,
+                                        search=query,
+                                        category=selected_category,
+                                        year=selected_year)}}">
+                                {{ p }}
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                    <!-- Forward button -->
+                    <li class="page-item {% if current_page == total_pages %} disabled {% endif %}">
+                        <a class="page-link rounded-circle me-2" 
+                            href="{{ url_for('archive',
+                                        page = current_page + 1,
+                                        search=query,
+                                        category=selected_category,
+                                        year=selected_year)}}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </div>
     </div>
-
 {% endblock %}
 
 {% block footer %}
     <footer class="bg-dark text-white text-center py-4">
         <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>
     </footer>
-
-    <!-- TODO: Create separate script file -->
-    <script>
-        document.getElementById('archiveSearch').addEventListener('keyup', function() {
-            let filter = this.value.toLowerCase();
-            let rows = document.querySelectorAll('#archiveTableBody tr');
-            
-            rows.forEach(row => {
-                let text = row.innerText.toLowerCase();
-                row.style.display = text.includes(filter) ? '' : 'none';
-            });
-        });
-    </script>
 {% endblock %}
 
