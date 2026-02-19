@@ -98,7 +98,7 @@
                     <!-- Back button -->
                     <li class="page-item {% if current_page == 1 %} disabled {% endif %}">
                         <a class="page-link rounded-circle me-2" 
-                            href="{{ url_for('archive',
+                            href="{{ url_for('archive.archive',
                                         page = current_page - 1,
                                         search=query,
                                         category=selected_category,
@@ -111,7 +111,7 @@
                     {% for p in range (1, total_pages + 1) %}
                         <li class="page-item {% if current_page == p %} active {% endif %}">
                             <a class="page-link rounded-circle me-2" 
-                                href="{{ url_for('archive',
+                                href="{{ url_for('archive.archive',
                                         page = p,
                                         search=query,
                                         category=selected_category,
@@ -124,7 +124,7 @@
                     <!-- Forward button -->
                     <li class="page-item {% if current_page == total_pages %} disabled {% endif %}">
                         <a class="page-link rounded-circle me-2" 
-                            href="{{ url_for('archive',
+                            href="{{ url_for('archive.archive',
                                         page = current_page + 1,
                                         search=query,
                                         category=selected_category,

@@ -13,8 +13,8 @@
             <h1 class="display-3 fw-bold mb-3">Цифрова спадщина факультету</h1>
             <p class="lead mb-5 opacity-90">Від заснування до сучасності — зберігаємо кожну сторінку нашої спільної історії</p>
             <div class="d-flex justify-content-center gap-3">
-                <a href="{{ url_for('timeline')}}" class="btn btn-yellow">Відкрити хронологію</a>
-                <a href="{{ url_for('archive')}}" class="btn btn-transparent">Переглянути архів</a>
+                <a href="{{ url_for('timeline.timeline')}}" class="btn btn-yellow">Відкрити хронологію</a>
+                <a href="{{ url_for('archive.archive')}}" class="btn btn-transparent">Переглянути архів</a>
             </div>
         </div>
     </header>
@@ -90,10 +90,10 @@
                 <div class="col-md-4">
                     <h5 class="fw-bold mb-3">Навігація</h5>
                     <ul class="list-unstyled small">
-                        <li><a href="{{url_for('timeline')}}" class="text-secondary text-decoration-none">Хронологія</a></li>
-                        <li><a href="{{url_for('archive')}}" class="text-secondary text-decoration-none">Архів</a></li>
-                        <li><a href="{{url_for('gallery')}}" class="text-secondary text-decoration-none">Галерея</a></li>
-                        <li><a href="{{url_for('persons')}}" class="text-secondary text-decoration-none">Постаті</a></li>
+                        <li><a href="{{url_for('timeline.timeline')}}" class="text-secondary text-decoration-none">Хронологія</a></li>
+                        <li><a href="{{url_for('archive.archive')}}" class="text-secondary text-decoration-none">Архів</a></li>
+                        <li><a href="{{url_for('gallery.gallery')}}" class="text-secondary text-decoration-none">Галерея</a></li>
+                        <li><a href="{{url_for('person.persons')}}" class="text-secondary text-decoration-none">Постаті</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4 text-end">

@@ -8,33 +8,33 @@
         <div class="col-lg-8">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('timeline') }}">Хронологія</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('timeline.timeline') }}">Хронологія</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ event.title }}</li>
                 </ol>
             </nav>
 
             <article class="card shadow-lg border-0 rounded-4 overflow-hidden mt-4">
                 {% if event.media_url %}
-                <div class="position-relative">
-                    <img src="{{ event.media_url }}" class="card-img-top object-fit-cover" style="max-height: 400px;"
-                        alt="{{ event.title }}">
-                    <div
-                        class="position-absolute bottom-0 start-0 bg-dark bg-opacity-75 text-white px-4 py-2 rounded-end">
-                        <span class="fs-4 fw-bold">{{ event.year }}</span>
+                    <div class="position-relative">
+                        <img src="{{ event.media_url }}" class="card-img-top object-fit-cover" style="max-height: 400px;"
+                            alt="{{ event.title }}">
+                        <div
+                            class="position-absolute bottom-0 start-0 bg-dark bg-opacity-75 text-white px-4 py-2 rounded-end">
+                            <span class="fs-4 fw-bold">{{ event.year }}</span>
+                        </div>
                     </div>
-                </div>
                 {% endif %}
 
                 <div class="card-body p-4 p-md-5">
                     <div class="d-flex align-items-center mb-4">
-                        <span class="badge bg-primary rounded-pill me-3">{{ event.year }}</span>
+                        <span class="badge bg-{{ event.category }} rounded-pill me-3">{{ event.year }}</span>
                         {% if CATEGORIES and event.category in CATEGORIES %}
-                        <span class="text-muted d-flex align-items-center">
-                            <i class="bi {{ CATEGORIES[event.category].icon }} me-2"></i>
-                            {{ CATEGORIES[event.category].label }}
-                        </span>
+                            <span class="text-muted d-flex align-items-center">
+                                <i class="bi {{ CATEGORIES[event.category].icon }} me-2"></i>
+                                {{ CATEGORIES[event.category].label }}
+                            </span>
                         {% else %}
-                        <span class="text-muted">{{ event.category }}</span>
+                            <span class="text-muted">{{ event.category }}</span>
                         {% endif %}
                     </div>
 
@@ -150,7 +150,7 @@
             </article>
 
             <div class="mt-5 text-center">
-                <a href="{{ url_for('timeline') }}" class="btn btn-outline-primary rounded-pill px-4">
+                <a href="{{ url_for('timeline.timeline') }}" class="btn btn-outline-primary rounded-pill px-4">
                     <i class="bi bi-arrow-left me-2"></i>Повернутися до хронології
                 </a>
             </div>

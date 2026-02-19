@@ -21,7 +21,6 @@
 /* Картка події */
 .timeline-item {
     position: relative;
-    cursor: pointer;
     margin-bottom: 60px;
     width: 100%;
 }

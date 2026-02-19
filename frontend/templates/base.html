@@ -16,38 +16,38 @@
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{{url_for('home')}}">КНУ Факультет матиматики та інформатики</a>
+            <a class="navbar-brand" href="{{url_for('home.home')}}">КНУ Факультет матиматики та інформатики</a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'home' %} active {% endif %}"
-                            href="{{url_for('home')}}">Головна</a>
+                            href="{{url_for('home.home')}}">Головна</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'timeline' %} active {% endif %}"
-                            href="{{url_for('timeline')}}">Хронологія</a>
+                            href="{{url_for('timeline.timeline')}}">Хронологія</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'archive' %} active {% endif %}"
-                            href="{{url_for('archive')}}">Архів</a>
+                            href="{{url_for('archive.archive')}}">Архів</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'gallery' %} active {% endif %}"
-                            href="{{url_for('gallery')}}">Галерея</a>
+                            href="{{url_for('gallery.gallery')}}">Галерея</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'persons' %} active {% endif %}"
-                            href="{{url_for('persons')}}">Постаті</a>
+                            href="{{url_for('person.persons')}}">Постаті</a>
                     </li>
 
                     <li class="nav-item d-none" id="nav-login">
-                        <a class="nav-link {% if request.endpoint == 'login_page' %} active {% endif %}"
-                            href="{{url_for('login_page')}}">Вхід</a>
+                        <a class="nav-link {% if request.endpoint == 'login' %} active {% endif %}"
+                            href="{{url_for('login.login')}}">Вхід</a>
                     </li>
 
                     <li class="nav-item d-none" id="nav-admin">
                         <a class="nav-link {% if request.endpoint == 'admin' %} active {% endif %}"
-                            href="{{url_for('admin')}}">Адмін-панель</a>
+                            href="{{url_for('admin.admin')}}">Адмін-панель</a>
                     </li>
                 </ul>
             </div>

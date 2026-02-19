@@ -39,20 +39,25 @@
 
         {% for event in events %}
         <div class="timeline-item {% if loop.index % 2 == 0 %} right-item {% else %} left-item {% endif %} clearfix"
-            data-year="{{ event.year }}" data-category="{{ event.category }}"
-            onclick="window.location.href='{{ url_for('event_detail', id=event.id) }}';" style="cursor: pointer;">
+            data-year="{{ event.year }}" data-category="{{ event.category }}">
+            
             <div class="timeline-dot"></div>
-            <div class="timeline-content">
+            
+            {% set event_url = url_for('event_detail.event_detail', id=event.id) %}
+            <div class="timeline-content"
+                onclick="window.location.href='{{ event_url }}';" 
+                style="cursor: pointer;">
+                
                 <span class="badge bg-{{ event.category }} year-badge">{{ event.year }}</span>
                 <h4 class="fw-bold">{{ event.title }}</h4>
                 <p class="text-muted">{{ event.short_description }}</p>
                 <div class="small text-{{ event.category }} fw-semibold">
                     {% if event.category in CATEGORIES %}
-                    <i class="bi {{ CATEGORIES[event.category][" icon"] }} me-1"></i>
-                    {{ CATEGORIES[event.category]["label"] }}
+                        <i class="bi {{ CATEGORIES[event.category]["icon"] }} me-1"></i>
+                        {{ CATEGORIES[event.category]["label"] }}
                     {% else %}
-                    <i class="bi bi-tag-fill me-1"></i>
-                    {{ event.category }}
+                        <i class="bi bi-tag-fill me-1"></i>
+                        {{ event.category }}
                     {% endif %}
                 </div>
             </div>
