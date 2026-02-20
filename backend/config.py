@@ -8,3 +8,5 @@ class Config:
 
     # Secret code for registration (In production, use env var)
     ADMIN_SECRET_CODE = "faculty2026" 
+    ADMIN_LOGIN = "admin"
+    ADMIN_PASSWORD = "admin123"

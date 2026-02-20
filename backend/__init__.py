@@ -4,6 +4,7 @@ from .models import db
 import os
 from flask_jwt_extended import JWTManager
 from .config import Config
+from datetime import timedelta
 
 def create_app():
     app = Flask(
@@ -14,9 +15,21 @@ def create_app():
 
     app.config.from_object(Config)
 
-    CORS(app)
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=7)
+
+    CORS(app, supports_credentials=True)
 
     app.config['JWT_SECRET_KEY'] = 'super-secret-key-change-me' 
+    app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token"
+    app.config["JWT_COOKIE_SECURE"] = False
+    app.config["JWT_COOKIE_SAMESITE"] = "Lax"
+
+    app.config["JWT_ACCESS_COOKIE_PATH"] = "/"
+    app.config["JWT_REFRESH_COOKIE_PATH"] = "/"
+
+    app.config["JWT_COOKIE_CSRF_PROTECT"] = False
     jwt = JWTManager(app)
 
     UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')

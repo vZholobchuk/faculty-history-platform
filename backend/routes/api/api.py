@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, make_response
 from werkzeug.utils import secure_filename
-from flask_jwt_extended import jwt_required, create_access_token
+from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, create_refresh_token, get_jwt_identity, set_refresh_cookies, unset_jwt_cookies
 from werkzeug.security import generate_password_hash, check_password_hash
 from ...models import db, Event, EventPhoto, EventVideo, EventDocument, Person, Document, GalleryAlbum, GalleryPhoto, GalleryVideoAlbum, GalleryVideo, User
+from ...constants import CATEGORIES
 import os
 import uuid
 
@@ -16,17 +17,30 @@ api_bp = Blueprint(
 def login():
     username = request.json.get('username', None)
     password = request.json.get('password', None)
+
+    if not username or not password:
+        return jsonify({"msg": "Username and password are required"}), 400
     
     user = User.query.filter_by(username=username).first()
     
     if user and check_password_hash(user.password_hash, password):
         access_token = create_access_token(identity=username)
-        return jsonify(access_token=access_token)
+        refresh_token = create_refresh_token(identity=username)
+        response = make_response(jsonify({"msg": "Login successful"}))
+        
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
 
-    if username == 'admin' and password == 'admin123':
+        return response
+    
+    if username == current_app.config['ADMIN_LOGIN'] and password == current_app.config['ADMIN_PASSWORD']:
         access_token = create_access_token(identity=username)
-        return jsonify(access_token=access_token)
+        response = make_response(jsonify({"msg": "Login successful"}))
+        
+        set_access_cookies(response, access_token)
 
+        return response
+        
     return jsonify({"msg": "Невірний логін або пароль"}), 401
 
 @api_bp.route('/register', methods=['POST'])
@@ -55,10 +69,30 @@ def register():
     
     return jsonify({"msg": "Адміністратор успішно створений"}), 201
 
+@api_bp.route("/logout", methods=["POST"])
+def logout():
+    response = jsonify({"msg": "logout successful"})
+    unset_jwt_cookies(response)
+    return response
+
+@api_bp.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    current_user = get_jwt_identity()
+
+    access_token = create_access_token(identity=current_user)
+    refresh_token = create_refresh_token(identity=current_user)
+
+    response = jsonify({"message": "Tokens refreshed"})
+
+    set_access_cookies(response, access_token)
+    set_refresh_cookies(response, refresh_token)
+    
+    return response
+
 @api_bp.route('/upload', methods=['POST'])
 @jwt_required()
 def upload_file():
-
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
 
@@ -133,13 +167,15 @@ def get_events():
         query = query.filter_by(year=year)
     if category:
         query = query.filter_by(category=category)
-    
     if search:
         query = query.filter(Event.title.ilike(f'%{search}%'))
 
     events = query.order_by(Event.year.desc()).all()
 
-    return jsonify([event.to_dict() for event in events]), 200
+    return jsonify({
+        "events": [event.to_dict() for event in events],
+        "categories": CATEGORIES
+    }), 200
 
 @api_bp.route('/events/<int:id>', methods=['PUT'])
 @jwt_required()
@@ -200,8 +236,15 @@ def delete_event(id):
 
     return jsonify({"message": "Event deleted successfully"})
 
+@api_bp.route('/events/<int:id>', methods=['GET'])
+@jwt_required()
+def get_event(id):
+    event = Event.query.get_or_404(id)
+    return jsonify(event.to_dict())
+
 # Persons
 @api_bp.route('/persons', methods=['GET'])
+@jwt_required()
 def get_persons():
     persons = Person.query.all()
     return jsonify([p.to_dict() for p in persons])
@@ -217,8 +260,11 @@ def add_person():
     new_person = Person(
         name=data['name'],
         role=data.get('role', 'Випускник'),
-        bio=data.get('bio', ''),
-        photo_url=data.get('photo_url', '')
+        photo_url=data.get('photo_url', ''),
+        short_bio=data.get('short_bio', ''),
+        full_bio=data.get('full_bio', ''),
+        life_years=data.get('life_years', ''),
+        profession_sphere=data.get('profession_sphere', '')
     )
 
     db.session.add(new_person)
@@ -255,8 +301,15 @@ def update_person(id):
     db.session.commit()
     return jsonify(person.to_dict())
 
+@api_bp.route('/persons/<int:id>', methods=['GET'])
+@jwt_required()
+def get_person(id):
+    person = Person.query.get_or_404(id)
+    return jsonify(person.to_dict())
+
 # Documents
 @api_bp.route('/documents', methods=['GET'])
+@jwt_required()
 def get_documents():
     docs = Document.query.all()
     return jsonify([d.to_dict() for d in docs])
@@ -293,6 +346,7 @@ def delete_document(id):
 
 # Gallery
 @api_bp.route('/gallery/albums', methods=['GET'])
+@jwt_required()
 def get_gallery_albums():
     albums = GalleryAlbum.query.all()
     return jsonify([a.to_dict() for a in albums])
@@ -328,6 +382,7 @@ def delete_gallery_album(id):
     return jsonify({"message": "Album deleted"})
 
 @api_bp.route('/gallery/video_albums', methods=['GET'])
+@jwt_required()
 def get_video_albums():
     albums = GalleryVideoAlbum.query.all()
 

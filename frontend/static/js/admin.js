@@ -1,17 +1,69 @@
 
 const API_URL = '/api';
-let token = localStorage.getItem('access_token');
 
 // --- AUTHENTICATION ---
 
-function checkAuth() {
-    if (!token) {
-        let loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-        loginModal.show();
+async function checkAuth() {
+    const isAccessTokenValid = await checkAccessToken();
+
+    if (!isAccessTokenValid) {
+        const refreshSuccess = await refreshToken();
+
+        if (!refreshSuccess) {
+            window.location.replace('/login');
+        } else {
+            loadEvents();
+        }
+
     } else {
-        loadEvents(); // Load default tab
+        loadEvents();
     }
 }
+
+async function checkAccessToken(){
+    const accessToken = getCookie('access_token');
+    
+    if (!accessToken) {
+        return false;
+    }
+
+    return true; 
+}
+
+async function refreshToken() {
+    const csrf = getCookie('csrf_refresh_token');
+
+    try {
+        const response = await fetch(`${API_URL}/refresh`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'X-CSRF-TOKEN': csrf
+            }
+        });
+
+        return response.ok;
+
+    } catch (err) {
+        console.error('Refresh failed:', err);
+        return false;
+    }
+}
+
+function getCookie(name) {
+    const cookies = document.cookie;
+    const cookieArr = cookies.split(';');
+
+    for (let i = 0; i < cookieArr.length; i++) {
+        const cookie = cookieArr[i].trim();
+        if (cookie.startsWith(name + '=')) {
+            return cookie.substring(name.length + 1);
+        }
+    }
+    return null;
+}
+
+// --- Login --- 
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -22,37 +74,36 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ username, password }),
+            credentials: 'include'
         });
 
         if (response.ok) {
-            const data = await response.json();
-            token = data.access_token;
-            localStorage.setItem('access_token', token);
             bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
             loadEvents();
         } else {
             document.getElementById('loginError').classList.remove('d-none');
         }
     } catch (err) {
-        console.error(err);
+        console.error('Login error:', err);
     }
 });
 
-function logout() {
-    localStorage.removeItem('access_token');
-    window.location.href = '/';
+async function logout() {
+    await fetch(`${API_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include'
+    });
+
+    window.location.replace('/login');
 }
 
 // --- NAVIGATION ---
 
 function showSection(sectionId) {
-    // Hide all sections
     document.querySelectorAll('.admin-section').forEach(el => el.classList.add('d-none'));
-    // Show selected
     document.getElementById(`section-${sectionId}`).classList.remove('d-none');
 
-    // Update active button
     document.querySelectorAll('.list-group-item').forEach(el => el.classList.remove('active'));
     event.target.closest('.list-group-item').classList.add('active');
 
@@ -65,24 +116,34 @@ function showSection(sectionId) {
 // --- EVENTS ---
 
 async function loadEvents() {
-    const res = await fetch(`${API_URL}/events`);
-    const events = await res.json();
+    const res = await fetch(`${API_URL}/events`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    const data = await res.json();
+
+    const events = data.events;
+    const categories = data.categories;
     const tbody = document.getElementById('events-table-body');
     tbody.innerHTML = '';
 
-    events.forEach(event => {
-        tbody.innerHTML += `
+    const rows = events.map(e => {
+        const userCategory = categories[e.category] ? categories[e.category].label : e.category;
+        
+        return `
             <tr>
-                <td>${event.year}</td>
-                <td>${event.title}</td>
-                <td><span class="badge bg-secondary">${event.category}</span></td>
-                <td>
-                    <button class="btn btn-sm btn-outline-warning" onclick="editEvent(${event.id})"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteEvent(${event.id})"><i class="bi bi-trash"></i></button>
-                </td>
-            </tr>
-        `;
-    });
+            <td>${e.year}</td>
+            <td>${e.title}</td>
+            <td><span class="badge bg-secondary">${userCategory}</span></td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning" onclick="editEvent(${e.id})"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteEvent(${e.id})"><i class="bi bi-trash"></i></button>
+            </td>
+        </tr>
+    `}).join('');
+
+    tbody.innerHTML = rows;
 }
 
 function openEventModal() {
@@ -111,9 +172,9 @@ document.getElementById('eventForm').addEventListener('submit', async (e) => {
         method: method,
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
+        credentials: 'include'
     });
 
     if (res.ok) {
@@ -128,70 +189,75 @@ async function deleteEvent(id) {
     if (!confirm('Видалити цю подію?')) return;
     await fetch(`${API_URL}/events/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include'
     });
     loadEvents();
 }
 
 async function editEvent(id) {
-    // Fetch event details
-    // In a real app we might fetch specifically /events/id, but for now we can just find it in the list if we stored it,
-    // or fetch it. Let's fetch it to be safe and accurate.
-    const res = await fetch(`${API_URL}/events/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
+    try{
+        const res = await fetch(`${API_URL}/events/${id}`, {
+            credentials: 'include'
+        });
 
-    // Note: GET /api/events/id wasn't explicitly created in app.py snippet I made?
-    // Wait, typical pattern. Let's check app.py.
-    // app.py has @app.route('/event/<int:id>') which renders template.
-    // It DOES NOT have @app.route('/api/events/<int:id>', methods=['GET']).
-    // It has PUT and DELETE.
+        if (!res.ok) {
+            alert('Не вдалося отримати подію');
+            return;
+        }
 
-    // Workaround: We can filter from the full list since pagination isn't huge yet.
-    // Or add the route. Adding route is better practice but modifying app.py again might be tedious.
-    // Let's rely on loadEvents data if possible? No, scope is local.
+        const event = await res.json();
 
-    // Let's implement client-side find for now, assuming we reload list often.
-    const allEventsRes = await fetch(`${API_URL}/events`); // We just re-fetch all
-    const allEvents = await allEventsRes.json();
-    const event = allEvents.find(e => e.id === id);
+        document.getElementById('eventId').value = event.id;
+        document.getElementById('eventYear').value = event.year;
+        document.getElementById('eventTitle').value = event.title;
+        document.getElementById('eventCategory').value = event.category;
+        document.getElementById('eventShortDesc').value = event.short_description || '';
+        document.getElementById('eventFullDesc').value = event.full_description || '';
+        document.getElementById('eventMediaUrl').value = event.media_url || '';
+        document.getElementById('eventGalleryUrls').value = (event.gallery || []).join(', ');
 
-    if (!event) return;
-
-    document.getElementById('eventId').value = event.id;
-    document.getElementById('eventYear').value = event.year;
-    document.getElementById('eventTitle').value = event.title;
-    document.getElementById('eventCategory').value = event.category;
-    document.getElementById('eventShortDesc').value = event.short_description || '';
-    document.getElementById('eventFullDesc').value = event.full_description || '';
-    document.getElementById('eventMediaUrl').value = event.media_url || '';
-
-    // Gallery is array of URLs in event.gallery
-    document.getElementById('eventGalleryUrls').value = (event.gallery || []).join(', ');
-
-    new bootstrap.Modal(document.getElementById('eventModal')).show();
+        new bootstrap.Modal(document.getElementById('eventModal')).show();
+    } catch (err) {
+        console.error(err);
+        alert('Помилка завантаження');
+    }
 }
 
 // --- PERSONS ---
+
 async function loadPersons() {
-    const res = await fetch(`${API_URL}/persons`);
+    const res = await fetch(`${API_URL}/persons`, {
+        credentials: 'include'
+    });
+
+    if (!res.ok) return;
+
     const persons = await res.json();
     const tbody = document.getElementById('persons-table-body');
     tbody.innerHTML = '';
 
-    persons.forEach(p => {
-        tbody.innerHTML += `
-            <tr>
-                <td><img src="${p.photo_url || '#'}" height="40" width="40" class="rounded-circle object-fit-cover"></td>
-                <td>${p.name}</td>
-                <td>${p.role}</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-warning" onclick="editPerson(${p.id})"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deletePerson(${p.id})"><i class="bi bi-trash"></i></button>
-                </td>
-            </tr>
-        `;
-    });
+    const rows = persons.map(p => `
+        <tr>
+            <td>
+                <img src="${p.photo_url || '/static/img/default-avatar.png'}"
+                     height="40"
+                     width="40"
+                     class="rounded-circle object-fit-cover">
+            </td>
+            <td>${p.name}</td>
+            <td>${p.role}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning" onclick="editPerson(${p.id})">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deletePerson(${p.id})">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+
+    tbody.innerHTML = rows;
 }
 
 function openPersonModal() {
@@ -201,22 +267,32 @@ function openPersonModal() {
 }
 
 async function editPerson(id) {
-    const res = await fetch(`${API_URL}/persons`);
-    const persons = await res.json();
-    const person = persons.find(p => p.id === id);
+    try {
+        const res = await fetch(`${API_URL}/persons/${id}`, {
+            credentials: 'include'
+        });
 
-    if (!person) return;
+        if (!res.ok) {
+            alert('Не вдалося отримати персону');
+            return;
+        }
 
-    document.getElementById('personId').value = person.id;
-    document.getElementById('personName').value = person.name;
-    document.getElementById('personRole').value = person.role;
-    document.getElementById('personPhotoUrl').value = person.photo_url || '';
-    document.getElementById('personShortBio').value = person.short_bio || '';
-    document.getElementById('personFullBio').value = person.full_bio || '';
-    document.getElementById('personLifeYears').value = person.life_years || '';
-    document.getElementById('personSphere').value = person.profession_sphere || '';
+        const person = await res.json();
 
-    new bootstrap.Modal(document.getElementById('personModal')).show();
+        document.getElementById('personId').value = person.id;
+        document.getElementById('personName').value = person.name;
+        document.getElementById('personRole').value = person.role;
+        document.getElementById('personPhotoUrl').value = person.photo_url || '';
+        document.getElementById('personShortBio').value = person.short_bio || '';
+        document.getElementById('personFullBio').value = person.full_bio || '';
+        document.getElementById('personLifeYears').value = person.life_years || '';
+        document.getElementById('personSphere').value = person.profession_sphere || '';
+
+        new bootstrap.Modal(document.getElementById('personModal')).show();
+    } catch (err) {
+        console.error(err);
+        alert('Помилка завантаження');
+    }
 }
 
 document.getElementById('personForm').addEventListener('submit', async (e) => {
@@ -239,8 +315,8 @@ document.getElementById('personForm').addEventListener('submit', async (e) => {
         method: method,
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify(data)
     });
 
@@ -256,7 +332,7 @@ async function deletePerson(id) {
     if (!confirm('Видалити?')) return;
     await fetch(`${API_URL}/persons/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include'
     });
     loadPersons();
 }
@@ -304,8 +380,8 @@ document.getElementById('photoAlbumForm').addEventListener('submit', async (e) =
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify(data)
     });
 
@@ -319,7 +395,7 @@ async function deletePhotoAlbum(id) {
     if (!confirm('Видалити альбом?')) return;
     await fetch(`${API_URL}/gallery/albums/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include'
     });
     loadPhotoAlbums();
 }
@@ -371,8 +447,8 @@ document.getElementById('videoAlbumForm').addEventListener('submit', async (e) =
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify(data)
     });
 
@@ -386,7 +462,7 @@ async function deleteVideoAlbum(id) {
     if (!confirm('Видалити відео-альбом?')) return;
     await fetch(`${API_URL}/gallery/video_albums/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include'
     });
     loadVideoAlbums();
 }
@@ -403,7 +479,7 @@ async function uploadFile(input, targetId) {
 
     const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }, // Usually auth needed
+        credentials: 'include',
         body: formData
     });
 
@@ -426,7 +502,7 @@ async function uploadMultipleFiles(input, targetId) {
 
         const res = await fetch(`${API_URL}/upload`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'include',
             body: formData
         });
 
