@@ -1,6 +1,30 @@
 
 const API_URL = '/api';
 
+let tempFiles = [];
+
+async function checkDatabaseConnection() {
+    try {
+        const response = await fetch('/api/check_connection', {
+            method: 'GET',
+            credentials: 'include' // This ensures that cookies (like JWTs) are included in the request
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log(data.message); // Logs: "Connection to the database is successful!"
+        } else {
+            console.error(data.error); // Logs the error message if the connection fails
+        }
+    } catch (error) {
+        console.error('Error checking database connection:', error);
+    }
+}
+
+// Call the function to check the connection
+checkDatabaseConnection();
+
 // --- AUTHENTICATION ---
 
 async function checkAuth() {
@@ -152,6 +176,9 @@ function openEventModal() {
     new bootstrap.Modal(document.getElementById('eventModal')).show();
 }
 
+document.getElementById('eventModal')
+    .addEventListener('hidden.bs.modal', cleanupTempFiles);
+
 document.getElementById('eventForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = document.getElementById('eventId').value;
@@ -184,6 +211,18 @@ document.getElementById('eventForm').addEventListener('submit', async (e) => {
         alert('Помилка збереження!');
     }
 });
+
+async function cleanupTempFiles() {
+    for (let url of tempFiles) {
+        await fetch(`${API_URL}/cleanup-temp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ url })
+        });
+    }
+    tempFiles = [];
+}
 
 async function deleteEvent(id) {
     if (!confirm('Видалити цю подію?')) return;
@@ -485,9 +524,13 @@ async function uploadFile(input, targetId) {
 
     if (res.ok) {
         const data = await res.json();
-        document.getElementById(targetId).value = data.url; // Fill the text input
+        document.getElementById(targetId).value = data.url;
     } else {
         alert('Upload failed');
+    }
+
+    if (data.url.includes('/static/temp/')) {
+        tempFiles.push(data.url);
     }
 }
 

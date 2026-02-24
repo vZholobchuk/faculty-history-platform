@@ -4,8 +4,10 @@ from flask_jwt_extended import jwt_required, create_access_token, set_access_coo
 from werkzeug.security import generate_password_hash, check_password_hash
 from ...models import db, Event, EventPhoto, EventVideo, EventDocument, Person, Document, GalleryAlbum, GalleryPhoto, GalleryVideoAlbum, GalleryVideo, User
 from ...constants import CATEGORIES
+from sqlalchemy import text
 import os
 import uuid
+import shutil
 
 api_bp = Blueprint(
     'api',
@@ -33,7 +35,6 @@ def login():
             
         # Fallback: Check if password was stored in plain text
         is_plain_text = (user.password == password)
-        
         if is_valid_hash or is_plain_text:
             # Migrate plain text to hashed password
             if is_plain_text:
@@ -117,13 +118,66 @@ def upload_file():
     unique_filename = f"{uuid.uuid4().hex}_{secure_filename(file.filename)}"
 
     upload_file=os.path.join(
-        current_app.config['UPLOAD_FOLDER'],
+        current_app.config['TEMP_UPLOAD_FOLDER'],
         unique_filename
     )
 
     file.save(upload_file)
 
-    return jsonify({'url': f'/static/uploads/{unique_filename}'}), 201
+    return jsonify({'url': f'/static/temp/{unique_filename}'}), 201
+
+def promote_file(temp_url):
+    if not temp_url or '/static/temp/' not in temp_url:
+        return temp_url
+
+    filename = temp_url.split('/')[-1]
+
+    temp_path = os.path.join(
+        current_app.config['TEMP_UPLOAD_FOLDER'],
+        filename
+    )
+
+    perm_path = os.path.join(
+        current_app.config['UPLOAD_FOLDER'],
+        filename
+    )
+
+    if os.path.exists(temp_path):
+        shutil.move(temp_path, perm_path)
+
+    return f'/static/uploads/{filename}'
+
+@api_bp.route('/cleanup-temp', methods=['POST'])
+@jwt_required()
+def cleanup_temp():
+    data = request.json
+    url = data.get('url')
+
+    if not url or '/static/temp/' not in url:
+        return jsonify({'message': 'Invalid url'}), 400
+
+    filename = url.split('/')[-1]
+
+    file_path = os.path.join(
+        current_app.config['TEMP_UPLOAD_FOLDER'],
+        filename
+    )
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    return jsonify({'message': 'Deleted'})
+
+# Check Database Connection
+@api_bp.route('/check_connection')
+def check_connection():
+    try:
+        # Explicitly declare the SQL query as text()
+        result = db.session.execute(text("SELECT 1"))
+        if result.fetchone():
+            return jsonify({"message": "Connection to the database is successful!"}), 200
+    except Exception as e:
+        return jsonify({"error": f"Database connection failed: {str(e)}"}), 500
 
 # Events
 @api_bp.route('/events', methods=['POST'])
@@ -134,20 +188,23 @@ def add_event():
     if not data or not 'title' in data or not 'year' in data:
         return jsonify({"error": "Title and Year are required"}), 400
 
+    media_url = promote_file(data.get('media_url', ''))
+
     new_event = Event(
         title=data['title'],
         year=data['year'],
-        short_description=data.get('short_description', data.get('description', '')),
-        full_description=data.get('full_description', data.get('description', '')),
+        short_description=data.get('short_description', ''),
+        full_description=data.get('full_description', ''),
         category=data['category'],
-        media_url=data.get('media_url', '')
+        media_url=media_url
     )
-
+    
     db.session.add(new_event)
     db.session.flush()
 
-    for url in data.get('gallery', []) :
-        db.session.add(EventPhoto(url=url, event_id=new_event.id))
+    for url in data.get('gallery', []):
+        promoted_url = promote_file(url)
+        db.session.add(EventPhoto(url=promoted_url, event_id=new_event.id))
 
     for v in data.get('videos', []):
         db.session.add(EventVideo(

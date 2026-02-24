@@ -2,8 +2,7 @@ import os
 import urllib.parse
 
 class Config:
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
-    
+    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")    
     # Azure SQL Database connection string
     params = urllib.parse.quote_plus(
         "Driver={ODBC Driver 18 for SQL Server};"

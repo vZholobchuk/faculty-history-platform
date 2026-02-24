@@ -1,3 +1,7 @@
+# Upload files
+frontend/static/temp
+frontend/static/uploads
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
