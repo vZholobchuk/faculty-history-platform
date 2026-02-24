@@ -23,24 +23,32 @@ def login():
     
     user = User.query.filter_by(username=username).first()
     
-    if user and check_password_hash(user.password_hash, password):
-        access_token = create_access_token(identity=username)
-        refresh_token = create_refresh_token(identity=username)
-        response = make_response(jsonify({"msg": "Login successful"}))
+    if user:
+        # Check if hash matches
+        is_valid_hash = False
+        try:
+            is_valid_hash = check_password_hash(user.password, password)
+        except ValueError:
+            pass # In case the hash string is malformed
+            
+        # Fallback: Check if password was stored in plain text
+        is_plain_text = (user.password == password)
         
-        set_access_cookies(response, access_token)
-        set_refresh_cookies(response, refresh_token)
+        if is_valid_hash or is_plain_text:
+            # Migrate plain text to hashed password
+            if is_plain_text:
+                user.password = generate_password_hash(password, method='pbkdf2:sha256')
+                db.session.commit()
 
-        return response
+            access_token = create_access_token(identity=username)
+            refresh_token = create_refresh_token(identity=username)
+            response = make_response(jsonify({"msg": "Login successful"}))
+            
+            set_access_cookies(response, access_token)
+            set_refresh_cookies(response, refresh_token)
+
+            return response
     
-    if username == current_app.config['ADMIN_LOGIN'] and password == current_app.config['ADMIN_PASSWORD']:
-        access_token = create_access_token(identity=username)
-        response = make_response(jsonify({"msg": "Login successful"}))
-        
-        set_access_cookies(response, access_token)
-
-        return response
-        
     return jsonify({"msg": "Невірний логін або пароль"}), 401
 
 @api_bp.route('/register', methods=['POST'])
@@ -56,12 +64,17 @@ def register():
     if secret_code != current_app.config["ADMIN_SECRET_CODE"]:
         return jsonify({"msg": "Невірний секретний код адміністратора"}), 403
         
-    if User.query.filter_by(username=username).first():
-        return jsonify({"msg": "Користувач з таким логіном вже існує"}), 400
+    user = User.query.filter_by(username=username).first()
+    new_hash = generate_password_hash(password, method='pbkdf2:sha256')
+
+    if user:
+        user.password = new_hash
+        db.session.commit()
+        return jsonify({"msg": "Пароль існуючого адміністратора оновлено"}), 200
         
     new_user = User(
         username=username,
-        password_hash=generate_password_hash(password)
+        password=new_hash
     )
     
     db.session.add(new_user)

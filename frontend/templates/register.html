@@ -17,13 +17,23 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Пароль</label>
-                <input type="password" class="form-control" id="regPassword" required>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="regPassword" required>
+                    <button class="btn btn-outline-secondary" type="button" id="toggleRegPassword">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
             </div>
             <div class="mb-3">
                 <label class="form-label">Секретний Код Адміністратора</label>
-                <input type="password" class="form-control" id="regSecret" placeholder="Введіть код від деканату"
-                    required>
-                <div class="form-text">Цей код необхідний для підтвердження прав.</div>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="regSecret" placeholder="Введіть код від деканату"
+                        required>
+                    <button class="btn btn-outline-secondary" type="button" id="toggleRegSecret">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <div class="form-text mt-1">Цей код необхідний для підтвердження прав.</div>
             </div>
 
             <div class="alert alert-danger d-none" id="regError">Помилка реєстрації. Перевірте секретний код.</div>
@@ -39,6 +49,23 @@
 </div>
 
 <script>
+    function togglePasswordVisibility(buttonId, inputId) {
+        document.getElementById(buttonId).addEventListener('click', function () {
+            const passInput = document.getElementById(inputId);
+            const icon = this.querySelector('i');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                passInput.type = 'password';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        });
+    }
+
+    togglePasswordVisibility('toggleRegPassword', 'regPassword');
+    togglePasswordVisibility('toggleRegSecret', 'regSecret');
+
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('regUsername').value;

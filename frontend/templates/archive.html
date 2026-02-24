@@ -3,144 +3,146 @@
 {% block title %}Цифровий Архів | ПНУ Історія {% endblock %}
 
 {% block links %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/archive.css' )}}">
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/archive.css' )}}">
 {% endblock %}
 
 {% block content %}
-    <header class="header text-center">
-        <div class="container">
-            <h1 class="display-4 fw-bold">Цифровий архів</h1>
-            <p class="lead opacity-75">Зберігаємо документи, що формували майбутнє нашого університету</p>
-        </div>
-    </header>
+<header class="header text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Цифровий архів</h1>
+        <p class="lead opacity-75">Зберігаємо документи, що формували майбутнє нашого університету</p>
+    </div>
+</header>
 
-    <div class="container mb-5">
-        <div class="archive-container">
-            <form class="row mb-4 g-3" method="get">
-                <!-- Search field -->
-                <div class="col-lg-5">
-                    <div class="input-group search-box">
-                        <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" name="search" value="{{ query }}" class="form-control border-0" placeholder="Пошук документа за назвою або описом...">
-                    </div>
+<div class="container mb-5">
+    <div class="archive-container">
+        <form class="row mb-4 g-3" method="get">
+            <!-- Search field -->
+            <div class="col-lg-5">
+                <div class="input-group search-box">
+                    <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="search" value="{{ query }}" class="form-control border-0"
+                        placeholder="Пошук документа за назвою або описом...">
                 </div>
-
-                <!-- Year field -->
-                <div class="col-lg-2">
-                    <div class="input-group search-box">
-                        <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
-                        <input type="number" name="year" value="{{ selected_year }}" class="form-control border-0" placeholder="Рік">
-                    </div>
-                </div>
-                
-                <!-- Categories -->
-                <div class="col-lg-3">
-                    <select name=category class="form-select search-box">
-                        <option value="">Всі категорії</option>
-                        {% for key, cat in CATEGORIES.items() %}
-                            <option value="{{ key }}" {% if key == selected_category %}selected{% endif %}> {{ cat.label }} </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="col-lg-2">
-                    <button class="btn btn-primary w-100 search-box fw-bold"><i class="bi bi-funnel me-2"></i> Фільтрувати</button>
-                </div>
-            </form>
-
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Назва документа</th>
-                            <th scope="col">Категорія</th>
-                            <th scope="col">Рік</th>
-                            <th scope="col">Формат</th>
-                            <th scope="col" class="text-end">Дія</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="archiveTableBody">
-                        {% for arch in archive %}
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        {% set type_data = FILE_TYPES.get(arch.file_type.lower(), FILE_TYPES["default"]) %}
-                                        <i class="bi {{ type_data.icon }} {{ arch.file_type }}-textcolor fs-3 me-3">
-                                        </i>
-                                        <div>
-                                            <div class="fw-bold text-dark">{{ arch.title }}</div>
-                                            <div class="small text-muted">{{ arch.subtitle }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <td><span class="category-badge cat-official text-uppercase">{{ CATEGORIES[arch.category]["label"] }}</span></td>
-                                
-                                <td>{{ arch.year }}</td>
-                                
-                                <td><span class="text-muted fw-bold">{{ arch.file_type.upper() }}</span></td>
-                                
-                                <td class="text-end">
-                                    <a href="{{ arch.file_url }}" class="btn btn-outline-primary btn-sm btn-download">
-                                        <i class="bi {{ type_data.btn_icon }} me-1"></i> {{ type_data.btn_title }}
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
             </div>
 
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <!-- Back button -->
-                    <li class="page-item {% if current_page == 1 %} disabled {% endif %}">
-                        <a class="page-link rounded-circle me-2" 
-                            href="{{ url_for('archive.archive',
+            <!-- Year field -->
+            <div class="col-lg-2">
+                <div class="input-group search-box">
+                    <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="number" name="year" value="{{ selected_year }}" class="form-control border-0"
+                        placeholder="Рік">
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="col-lg-3">
+                <select name=category class="form-select search-box">
+                    <option value="">Всі категорії</option>
+                    {% for key, cat in CATEGORIES.items() %}
+                    <option value="{{ key }}" {% if key==selected_category %}selected{% endif %}> {{ cat.label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-lg-2">
+                <button class="btn btn-primary w-100 search-box fw-bold"><i class="bi bi-funnel me-2"></i>
+                    Фільтрувати</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Назва документа</th>
+                        <th scope="col">Категорія</th>
+                        <th scope="col">Рік</th>
+                        <th scope="col">Формат</th>
+                        <th scope="col" class="text-end">Дія</th>
+                    </tr>
+                </thead>
+
+                <tbody id="archiveTableBody">
+                    {% for arch in archive %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% set ftype = arch.file_type if arch.file_type else 'default' %}
+                                {% set type_data = FILE_TYPES.get(ftype.lower(), FILE_TYPES["default"]) %}
+                                <i class="bi {{ type_data.icon }} {{ ftype }}-textcolor fs-3 me-3">
+                                </i>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ arch.title }}</div>
+                                    <div class="small text-muted">{{ arch.subtitle }}</div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td><span class="category-badge cat-official text-uppercase">{{ CATEGORIES.get(arch.category,
+                                {"label": "Невідомо"}).get("label", "Невідомо") }}</span></td>
+
+                        <td>{{ arch.year or "" }}</td>
+
+                        <td><span class="text-muted fw-bold">{{ ftype.upper() }}</span></td>
+
+                        <td class="text-end">
+                            <a href="{{ arch.file_url }}" class="btn btn-outline-primary btn-sm btn-download">
+                                <i class="bi {{ type_data.btn_icon }} me-1"></i> {{ type_data.btn_title }}
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <!-- Back button -->
+                <li class="page-item {% if current_page == 1 %} disabled {% endif %}">
+                    <a class="page-link rounded-circle me-2" href="{{ url_for('archive.archive',
                                         page = current_page - 1,
                                         search=query,
                                         category=selected_category,
                                         year=selected_year)}}">
-                            <i class="bi bi-chevron-left"></i>
-                        </a>
-                    </li>
-                    
-                    <!-- Pages button -->
-                    {% for p in range (1, total_pages + 1) %}
-                        <li class="page-item {% if current_page == p %} active {% endif %}">
-                            <a class="page-link rounded-circle me-2" 
-                                href="{{ url_for('archive.archive',
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+
+                <!-- Pages button -->
+                {% for p in range (1, total_pages + 1) %}
+                <li class="page-item {% if current_page == p %} active {% endif %}">
+                    <a class="page-link rounded-circle me-2" href="{{ url_for('archive.archive',
                                         page = p,
                                         search=query,
                                         category=selected_category,
                                         year=selected_year)}}">
-                                {{ p }}
-                            </a>
-                        </li>
-                    {% endfor %}
+                        {{ p }}
+                    </a>
+                </li>
+                {% endfor %}
 
-                    <!-- Forward button -->
-                    <li class="page-item {% if current_page == total_pages %} disabled {% endif %}">
-                        <a class="page-link rounded-circle me-2" 
-                            href="{{ url_for('archive.archive',
+                <!-- Forward button -->
+                <li class="page-item {% if current_page == total_pages %} disabled {% endif %}">
+                    <a class="page-link rounded-circle me-2" href="{{ url_for('archive.archive',
                                         page = current_page + 1,
                                         search=query,
                                         category=selected_category,
                                         year=selected_year)}}">
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
+</div>
 {% endblock %}
 
 {% block footer %}
-    <footer class="bg-dark text-white text-center py-4">
-        <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>
-    </footer>
+<footer class="bg-dark text-white text-center py-4">
+    <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>
+</footer>
 {% endblock %}
-
