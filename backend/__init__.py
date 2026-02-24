@@ -13,6 +13,8 @@ def create_app():
         static_folder="../frontend/static"
     )
 
+    assert app.static_folder is not None
+
     app.config.from_object(Config)
 
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
@@ -20,7 +22,7 @@ def create_app():
 
     CORS(app, supports_credentials=True)
 
-    app.config['JWT_SECRET_KEY'] = 'super-secret-key-change-me' 
+    app.config['JWT_SECRET_KEY'] = '9930b4ff77622e07de533b38ab3f6a0ec90d9f44c278221533fb163d33b34d79' 
     app.config['JWT_TOKEN_LOCATION'] = ['cookies']
     app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token"
     app.config["JWT_COOKIE_SECURE"] = False
@@ -32,10 +34,14 @@ def create_app():
     app.config["JWT_COOKIE_CSRF_PROTECT"] = False
     jwt = JWTManager(app)
 
+    TEMP_UPLOAD_FOLDER = os.path.join(app.static_folder, 'temp')
     UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
+    
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    app.config['TEMP_UPLOAD_FOLDER']= TEMP_UPLOAD_FOLDER
 
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    os.makedirs(TEMP_UPLOAD_FOLDER, exist_ok=True)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///faculty.db"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
