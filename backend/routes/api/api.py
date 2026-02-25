@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, create_refresh_token, get_jwt_identity, set_refresh_cookies, unset_jwt_cookies
 from werkzeug.security import generate_password_hash, check_password_hash
 from ...models import db, Event, EventPhoto, EventVideo, EventDocument, Person, Document, GalleryAlbum, GalleryPhoto, GalleryVideoAlbum, GalleryVideo, User
-from ...constants import CATEGORIES
+from ...constants import CATEGORIES, FILE_TYPES
 from sqlalchemy import text
 from sqlalchemy.orm import selectinload
 import os
@@ -406,6 +406,7 @@ def get_documents():
     pagination = Document.query.order_by(Document.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
     return jsonify({
         "documents": [d.to_dict() for d in pagination.items],
+        "FILE_TYPES": FILE_TYPES,
         "page": page,
         "total_pages": pagination.pages,
         "total": pagination.total
