@@ -435,11 +435,9 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Тип файлу</label>
                             <select class="form-select" id="documentFileType">
-                                <option value="pdf">PDF</option>
-                                <option value="doc">Word (DOC/DOCX)</option>
-                                <option value="img">Зображення</option>
-                                <option value="archive">Архів</option>
-                                <option value="other">Інше</option>
+                                {% for key, cat in FILE_TYPES.items() %}
+                                    <option value="{{ key }}">{{ key|upper }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
