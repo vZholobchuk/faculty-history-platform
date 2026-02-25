@@ -579,6 +579,63 @@ def add_video_album():
         "videos": [{"url": v.video_url, "caption": v.caption} for v in new_album.videos]
     }), 201
 
+@api_bp.route('/gallery/video_albums/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_video_album(id):
+    album = GalleryVideoAlbum.query.get_or_404(id)
+    data = request.json
+
+    # Update main fields
+    album.title = data.get('title', album.title)
+    album.description = data.get('description', album.description)
+
+    if 'cover_url' in data and data['cover_url'] != album.cover_url:
+        album.cover_url = promote_file(data['cover_url'])
+
+    # Update videos if provided
+    if 'videos' in data:
+        # Remove old videos
+        GalleryVideo.query.filter_by(album_id=id).delete()
+
+        # Add new ones
+        for v_data in data['videos']:
+            video = GalleryVideo(
+                video_url=promote_file(v_data.get('url')),
+                caption=v_data.get('caption', ''),
+                album_id=id
+            )
+            db.session.add(video)
+
+    db.session.commit()
+
+    return jsonify({
+        "id": album.id,
+        "title": album.title,
+        "description": album.description,
+        "cover_url": album.cover_url,
+        "videos": [{"url": v.video_url, "caption": v.caption} for v in album.videos]
+    })
+
+@api_bp.route('/gallery/video_albums/<int:id>', methods=['GET'])
+@jwt_required()
+def get_album(id):
+    album = GalleryVideoAlbum.query.get_or_404(id)
+
+    return jsonify({
+        "id": album.id,
+        "title": album.title,
+        "description": album.description,
+        "cover_url": album.cover_url,
+        "videos": [
+            {
+                "id": v.id,
+                "url": v.video_url,
+                "caption": v.caption
+            }
+            for v in album.videos
+        ]
+    })
+
 @api_bp.route('/gallery/video_albums/<int:id>', methods=['DELETE'])
 @jwt_required()
 def delete_video_album(id):

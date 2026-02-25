@@ -540,7 +540,15 @@ async function loadVideoAlbums(page = 1) {
                     <div class="card-body">
                         <h5 class="card-title">${a.title}</h5>
                         <p class="card-text small text-muted">${a.description || ''}</p>
-                        <button class="btn btn-sm btn-danger w-100" onclick="deleteVideoAlbum(${a.id})">Видалити</button>
+                        <button class="btn btn-sm btn-outline-warning w-100 mb-2"
+                            onclick="editVideoAlbum(${a.id})">
+                            Редагувати
+                        </button>
+
+                        <button class="btn btn-sm btn-danger w-100"
+                            onclick="deleteVideoAlbum(${a.id})">
+                            Видалити
+                        </button>
                     </div>
                 </div>
             </div>
@@ -551,36 +559,77 @@ async function loadVideoAlbums(page = 1) {
 
 function openVideoAlbumModal() {
     document.getElementById('videoAlbumForm').reset();
+    document.getElementById('videoAlbumId').value = '';
+    document.getElementById('videoAlbumSubmitBtn').textContent = 'Створити Відео-альбом';
+
     new bootstrap.Modal(document.getElementById('videoAlbumModal')).show();
 }
 
 document.getElementById('videoAlbumForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    const id = document.getElementById('videoAlbumId').value;
+    const method = id ? 'PUT' : 'POST';
+    const url = id 
+        ? `${API_URL}/gallery/video_albums/${id}` 
+        : `${API_URL}/gallery/video_albums`;
+
+    const videoUrls = document.getElementById('videoAlbumUrls')
+        .value.split(',')
+        .filter(x => x.trim());
+
     const data = {
         title: document.getElementById('videoAlbumTitle').value,
         description: document.getElementById('videoAlbumDesc').value,
         cover_url: document.getElementById('videoAlbumCoverUrl').value,
-        videos: [] // Logic to parse video inputs would ideally go here, simplifying for now
+        videos: videoUrls.map(url => ({ url: url.trim(), caption: '' }))
     };
 
-    // Quick hack for videos input: Assume user enters comma separated URLs for now in a simple input
-    const videoUrls = document.getElementById('videoAlbumUrls').value.split(',').filter(x => x);
-    data.videos = videoUrls.map(url => ({ url: url, caption: '' }));
-
-    const res = await fetch(`${API_URL}/gallery/video_albums`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+    const res = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(data)
     });
 
     if (res.ok) {
-        bootstrap.Modal.getInstance(document.getElementById('videoAlbumModal')).hide();
+        document.activeElement.blur();
+
+        const modalEl = document.getElementById('videoAlbumModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+
+        modal.hide();
+
         loadVideoAlbums();
+    } else {
+        alert('Помилка збереження!');
     }
 });
+
+async function editVideoAlbum(id) {
+    const res = await fetch(`${API_URL}/gallery/video_albums/${id}`, {
+        credentials: 'include'
+    });
+
+    if (!res.ok) {
+        alert('Не вдалося отримати відео-альбом');
+        return;
+    }
+
+    const album = await res.json();
+
+    document.getElementById('videoAlbumId').value = album.id;
+    document.getElementById('videoAlbumTitle').value = album.title;
+    document.getElementById('videoAlbumDesc').value = album.description || '';
+    document.getElementById('videoAlbumCoverUrl').value = album.cover_url || '';
+
+    const urls = album.videos.map(v => v.url).join(',');
+    document.getElementById('videoAlbumUrls').value = urls;
+
+    document.getElementById('videoAlbumSubmitBtn').textContent = 'Оновити Альбом';
+
+    new bootstrap.Modal(document.getElementById('videoAlbumModal')).show();
+}
 
 async function deleteVideoAlbum(id) {
     if (!confirm('Видалити відео-альбом?')) return;

@@ -371,6 +371,7 @@
             </div>
             <div class="modal-body">
                 <form id="videoAlbumForm">
+                    <input type="hidden" id="videoAlbumId">
                     <div class="mb-3">
                         <label class="form-label">Назва альбому</label>
                         <input type="text" class="form-control" id="videoAlbumTitle" required>
@@ -390,7 +391,9 @@
                             placeholder="https://youtube.com/..., https://youtube.com/..."></textarea>
                     </div>
                     <div class="text-end">
-                        <button type="submit" class="btn btn-primary">Створити Відео-альбом</button>
+                        <button type="submit" class="btn btn-primary" id="videoAlbumSubmitBtn">
+                            Зберегти
+                        </button>
                     </div>
                 </form>
             </div>
