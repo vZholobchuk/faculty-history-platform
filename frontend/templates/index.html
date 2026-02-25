@@ -1,108 +1,127 @@
 {% extends 'base.html' %}
 
-{% block title %} Головна | КНУ МІФ Історія {% endblock %}    
+{% block title %} Головна | КНУ МІФ Історія {% endblock %}
 
 {% block links %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 {% endblock %}
 
 {% block content %}
-    <header class="header text-center">
-        <div class="container">
-            <h1 class="display-3 fw-bold mb-3">Цифрова спадщина факультету</h1>
-            <p class="lead mb-5 opacity-90">Від заснування до сучасності — зберігаємо кожну сторінку нашої спільної історії</p>
-            <div class="d-flex justify-content-center gap-3">
-                <a href="{{ url_for('timeline.timeline')}}" class="btn btn-yellow">Відкрити хронологію</a>
-                <a href="{{ url_for('archive.archive')}}" class="btn btn-transparent">Переглянути архів</a>
+<header class="header text-center">
+    <div class="container">
+        <h1 class="display-3 fw-bold mb-3">Цифрова спадщина факультету</h1>
+        <p class="lead mb-5 opacity-90">Від заснування до сучасності — зберігаємо кожну сторінку нашої спільної історії
+        </p>
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+            <a href="{{ url_for('timeline.timeline')}}"
+                class="btn btn-warning fw-bold px-4 py-2 text-dark border-0 shadow-sm"
+                style="border-radius: 50px;">Відкрити хронологію</a>
+            <a href="{{ url_for('archive.archive')}}" class="btn btn-outline-light px-4 py-2 border-2 shadow-sm"
+                style="border-radius: 50px;">Переглянути архів</a>
+        </div>
+    </div>
+</header>
+
+<section class="container mb-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <i class="bi bi-people-fill stat-icon"></i>
+                <h3 class="fw-bold">5000+</h3>
+                <p class="text-muted mb-0">Випускників</p>
             </div>
         </div>
-    </header>
-
-    <section class="container mb-5">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="stat-card text-center">
-                    <i class="bi bi-people-fill stat-icon"></i>
-                    <h3 class="fw-bold">5000+</h3>
-                    <p class="text-muted mb-0">Випускників</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card text-center">
-                    <i class="bi bi-mortarboard-fill stat-icon"></i>
-                    <h3 class="fw-bold">6</h3>
-                    <p class="text-muted mb-0">Провідних кафедр</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card text-center">
-                    <i class="bi bi-calendar-check-fill stat-icon"></i>
-                    <h3 class="fw-bold">1940</h3>
-                    <p class="text-muted mb-0">Рік заснування</p>
-                </div>
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <i class="bi bi-mortarboard-fill stat-icon"></i>
+                <h3 class="fw-bold">6</h3>
+                <p class="text-muted mb-0">Провідних кафедр</p>
             </div>
         </div>
-    </section>
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <i class="bi bi-calendar-check-fill stat-icon"></i>
+                <h3 class="fw-bold">1940</h3>
+                <p class="text-muted mb-0">Рік заснування</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <section class="about-section">
-        <div class="container">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-6">
-                    <h2 class="section-title">Про платформу</h2>
-                    <p class="lead">Ця інтерактивна платформа створена для збереження та популяризації цифрової спадщини нашого факультету.</p>
-                    <p>Тут ви знайдете унікальні архівні документи, фотографії видатних викладачів та опис ключових подій, що сформували наш підрозділ протягом десятиліть. Ми прагнемо поєднати академічні традиції з сучасними технологіями.</p>
-                    <div class="mt-4 d-flex gap-4">
-                        <div>
-                            <h5 class="fw-bold text-primary">Місія</h5>
-                            <p class="small">Збереження пам'яті для майбутніх поколінь студентів.</p>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold text-primary">Технології</h5>
-                            <p class="small">Цифрові архіви та медіа-бібліотека.</p>
-                        </div>
+<section class="about-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2 class="section-title">Про платформу</h2>
+                <p class="lead">Ця інтерактивна платформа створена для збереження та популяризації цифрової спадщини
+                    нашого факультету.</p>
+                <p>Тут ви знайдете унікальні архівні документи, фотографії видатних викладачів та опис ключових подій,
+                    що сформували наш підрозділ протягом десятиліть. Ми прагнемо поєднати академічні традиції з
+                    сучасними технологіями.</p>
+                <div class="mt-4 d-flex gap-4">
+                    <div>
+                        <h5 class="fw-bold text-primary">Місія</h5>
+                        <p class="small">Збереження пам'яті для майбутніх поколінь студентів.</p>
                     </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="feature-box shadow-sm">
-                        <h4 class="fw-bold mb-4"><i class="bi bi-info-circle me-2 text-primary"></i> Що доступно на сайті:</h4>
-                        <ul class="list-unstyled">
-                            <li class="mb-3 d-flex align-items-center"><i class="bi bi-check2-circle text-success me-3 fs-5"></i> Інтерактивна лінія часу (1940-2025)</li>
-                            <li class="mb-3 d-flex align-items-center"><i class="bi bi-check2-circle text-success me-3 fs-5"></i> Пошук в архіві документів</li>
-                            <li class="mb-3 d-flex align-items-center"><i class="bi bi-check2-circle text-success me-3 fs-5"></i> Галерея фото та відео подій факультету</li>
-                            <li class="mb-3 d-flex align-items-center"><i class="bi bi-check2-circle text-success me-3 fs-5"></i> Профілі видатних постатей університету</li>
-                        </ul>
+                    <div>
+                        <h5 class="fw-bold text-primary">Технології</h5>
+                        <p class="small">Цифрові архіви та медіа-бібліотека.</p>
                     </div>
                 </div>
             </div>
+            <div class="col-lg-6">
+                <div class="feature-box shadow-sm">
+                    <h4 class="fw-bold mb-4"><i class="bi bi-info-circle me-2 text-primary"></i> Що доступно на сайті:
+                    </h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3 d-flex align-items-center"><i
+                                class="bi bi-check2-circle text-success me-3 fs-5"></i> Інтерактивна лінія часу
+                            (1940-2025)</li>
+                        <li class="mb-3 d-flex align-items-center"><i
+                                class="bi bi-check2-circle text-success me-3 fs-5"></i> Пошук в архіві документів</li>
+                        <li class="mb-3 d-flex align-items-center"><i
+                                class="bi bi-check2-circle text-success me-3 fs-5"></i> Галерея фото та відео подій
+                            факультету</li>
+                        <li class="mb-3 d-flex align-items-center"><i
+                                class="bi bi-check2-circle text-success me-3 fs-5"></i> Профілі видатних постатей
+                            університету</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
+</section>
 {% endblock %}
 
 {% block footer %}
-    <footer class="bg-dark text-white text-center py-5">
-        <div class="container">
-            <div class="row mb-4">
-                <div class="col-md-4 text-start">
-                    <h5 class="fw-bold text-warning">КНУ МІФ Історія</h5>
-                    <p class="small text-secondary">Цифровий проект факультету математики та інформатики.</p>
-                </div>
-                <div class="col-md-4">
-                    <h5 class="fw-bold mb-3">Навігація</h5>
-                    <ul class="list-unstyled small">
-                        <li><a href="{{url_for('timeline.timeline')}}" class="text-secondary text-decoration-none">Хронологія</a></li>
-                        <li><a href="{{url_for('archive.archive')}}" class="text-secondary text-decoration-none">Архів</a></li>
-                        <li><a href="{{url_for('gallery.gallery')}}" class="text-secondary text-decoration-none">Галерея</a></li>
-                        <li><a href="{{url_for('persons.persons')}}" class="text-secondary text-decoration-none">Постаті</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 text-end">
-                    <h5 class="fw-bold mb-3">Контакти</h5>
-                    <p class="small text-secondary">вул. Шевченка, 57<br>Івано-Франківськ, Україна</p>
-                </div>
+<footer class="bg-dark text-white text-center py-5">
+    <div class="container">
+        <div class="row mb-4 text-center text-md-start gap-4 gap-md-0">
+            <div class="col-md-4">
+                <h5 class="fw-bold text-warning">КНУ МІФ Історія</h5>
+                <p class="small text-secondary">Цифровий проект факультету математики та інформатики.</p>
             </div>
-            <hr class="border-secondary">
-            <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>
+            <div class="col-md-4">
+                <h5 class="fw-bold mb-3">Навігація</h5>
+                <ul class="list-unstyled small">
+                    <li><a href="{{url_for('timeline.timeline')}}"
+                            class="text-secondary text-decoration-none">Хронологія</a></li>
+                    <li><a href="{{url_for('archive.archive')}}" class="text-secondary text-decoration-none">Архів</a>
+                    </li>
+                    <li><a href="{{url_for('gallery.gallery')}}" class="text-secondary text-decoration-none">Галерея</a>
+                    </li>
+                    <li><a href="{{url_for('persons.persons')}}" class="text-secondary text-decoration-none">Постаті</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-4 text-center text-md-end">
+                <h5 class="fw-bold mb-3">Контакти</h5>
+                <p class="small text-secondary">вул. Шевченка, 57<br>Івано-Франківськ, Україна</p>
+            </div>
         </div>
-    </footer>
+        <hr class="border-secondary">
+        <p class="mb-0 small text-secondary">© 2026 Прикарпатський національний університет імені Василя Стефаника</p>
+    </div>
+</footer>
 {% endblock %}

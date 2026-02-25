@@ -44,14 +44,14 @@ async function checkAuth() {
     }
 }
 
-async function checkAccessToken(){
+async function checkAccessToken() {
     const accessToken = getCookie('access_token');
-    
+
     if (!accessToken) {
         return false;
     }
 
-    return true; 
+    return true;
 }
 
 async function refreshToken() {
@@ -122,6 +122,24 @@ async function logout() {
     window.location.replace('/login');
 }
 
+function renderPagination(page, totalPages, loadFunctionString) {
+    if (totalPages <= 1) return '';
+    let html = '<nav><ul class="pagination justify-content-center">';
+    html += `<li class="page-item ${page === 1 ? 'disabled' : ''}">
+        <button class="page-link" onclick="${loadFunctionString}(${page - 1})">&laquo;</button>
+    </li>`;
+    for (let i = 1; i <= totalPages; i++) {
+        html += `<li class="page-item ${page === i ? 'active' : ''}">
+            <button class="page-link" onclick="${loadFunctionString}(${i})">${i}</button>
+        </li>`;
+    }
+    html += `<li class="page-item ${page === totalPages ? 'disabled' : ''}">
+        <button class="page-link" onclick="${loadFunctionString}(${page + 1})">&raquo;</button>
+    </li>`;
+    html += '</ul></nav>';
+    return html;
+}
+
 // --- NAVIGATION ---
 
 function showSection(sectionId) {
@@ -135,12 +153,13 @@ function showSection(sectionId) {
     if (sectionId === 'persons') loadPersons();
     if (sectionId === 'photo-gallery') loadPhotoAlbums();
     if (sectionId === 'video-gallery') loadVideoAlbums();
+    if (sectionId === 'documents') loadDocuments();
 }
 
 // --- EVENTS ---
 
-async function loadEvents() {
-    const res = await fetch(`${API_URL}/events`, {
+async function loadEvents(page = 1) {
+    const res = await fetch(`${API_URL}/events?page=${page}&limit=10`, {
         method: 'GET',
         credentials: 'include'
     });
@@ -154,7 +173,7 @@ async function loadEvents() {
 
     const rows = events.map(e => {
         const userCategory = categories[e.category] ? categories[e.category].label : e.category;
-        
+
         return `
             <tr>
             <td>${e.year}</td>
@@ -168,6 +187,7 @@ async function loadEvents() {
     `}).join('');
 
     tbody.innerHTML = rows;
+    document.getElementById('events-pagination').innerHTML = renderPagination(data.page, data.total_pages, 'loadEvents');
 }
 
 function openEventModal() {
@@ -234,7 +254,7 @@ async function deleteEvent(id) {
 }
 
 async function editEvent(id) {
-    try{
+    try {
         const res = await fetch(`${API_URL}/events/${id}`, {
             credentials: 'include'
         });
@@ -264,14 +284,15 @@ async function editEvent(id) {
 
 // --- PERSONS ---
 
-async function loadPersons() {
-    const res = await fetch(`${API_URL}/persons`, {
+async function loadPersons(page = 1) {
+    const res = await fetch(`${API_URL}/persons?page=${page}&limit=10`, {
         credentials: 'include'
     });
 
     if (!res.ok) return;
 
-    const persons = await res.json();
+    const data = await res.json();
+    const persons = data.persons;
     const tbody = document.getElementById('persons-table-body');
     tbody.innerHTML = '';
 
@@ -297,6 +318,7 @@ async function loadPersons() {
     `).join('');
 
     tbody.innerHTML = rows;
+    document.getElementById('persons-pagination').innerHTML = renderPagination(data.page, data.total_pages, 'loadPersons');
 }
 
 function openPersonModal() {
@@ -379,9 +401,10 @@ async function deletePerson(id) {
 
 // --- PHOTO ALBUMS ---
 
-async function loadPhotoAlbums() {
-    const res = await fetch(`${API_URL}/gallery/albums`);
-    const albums = await res.json();
+async function loadPhotoAlbums(page = 1) {
+    const res = await fetch(`${API_URL}/gallery/albums?page=${page}&limit=9`);
+    const data = await res.json();
+    const albums = data.albums;
     const container = document.getElementById('photo-albums-container');
     container.innerHTML = '';
 
@@ -399,6 +422,7 @@ async function loadPhotoAlbums() {
             </div>
         `;
     });
+    document.getElementById('photo-albums-pagination').innerHTML = renderPagination(data.page, data.total_pages, 'loadPhotoAlbums');
 }
 
 function openPhotoAlbumModal() {
@@ -442,9 +466,10 @@ async function deletePhotoAlbum(id) {
 
 // --- VIDEO ALBUMS ---
 
-async function loadVideoAlbums() {
-    const res = await fetch(`${API_URL}/gallery/video_albums`);
-    const albums = await res.json();
+async function loadVideoAlbums(page = 1) {
+    const res = await fetch(`${API_URL}/gallery/video_albums?page=${page}&limit=9`);
+    const data = await res.json();
+    const albums = data.video_albums;
     const container = document.getElementById('video-albums-container');
     container.innerHTML = '';
 
@@ -462,6 +487,7 @@ async function loadVideoAlbums() {
             </div>
         `;
     });
+    document.getElementById('video-albums-pagination').innerHTML = renderPagination(data.page, data.total_pages, 'loadVideoAlbums');
 }
 
 function openVideoAlbumModal() {
@@ -504,6 +530,112 @@ async function deleteVideoAlbum(id) {
         credentials: 'include'
     });
     loadVideoAlbums();
+}
+
+
+// --- DOCUMENTS ---
+
+async function loadDocuments(page = 1) {
+    const res = await fetch(`${API_URL}/documents?page=${page}&limit=10`, {
+        credentials: 'include'
+    });
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const documents = data.documents;
+    const tbody = document.getElementById('documents-table-body');
+    tbody.innerHTML = '';
+
+    const rows = documents.map(d => `
+        <tr>
+            <td>${d.year || ''}</td>
+            <td>${d.title}</td>
+            <td><span class="badge bg-secondary">${d.category || ''}</span></td>
+            <td>${d.file_type || ''}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning" onclick="editDocument(${d.id})"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument(${d.id})"><i class="bi bi-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+
+    tbody.innerHTML = rows;
+    document.getElementById('documents-pagination').innerHTML = renderPagination(data.page, data.total_pages, 'loadDocuments');
+}
+
+function openDocumentModal() {
+    document.getElementById('documentForm').reset();
+    document.getElementById('documentId').value = '';
+    new bootstrap.Modal(document.getElementById('documentModal')).show();
+}
+
+async function editDocument(id) {
+    try {
+        const res = await fetch(`${API_URL}/documents/${id}`, {
+            credentials: 'include'
+        });
+
+        if (!res.ok) {
+            alert('Не вдалося отримати документ');
+            return;
+        }
+
+        const doc = await res.json();
+
+        document.getElementById('documentId').value = doc.id;
+        document.getElementById('documentTitle').value = doc.title;
+        document.getElementById('documentSubtitle').value = doc.subtitle || '';
+        document.getElementById('documentYear').value = doc.year || '';
+        document.getElementById('documentCategory').value = doc.category || '';
+        document.getElementById('documentFileType').value = doc.file_type || 'other';
+        document.getElementById('documentFileUrl').value = doc.file_url || '';
+
+        new bootstrap.Modal(document.getElementById('documentModal')).show();
+    } catch (err) {
+        console.error(err);
+        alert('Помилка завантаження');
+    }
+}
+
+document.getElementById('documentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('documentId').value;
+    const method = id ? 'PUT' : 'POST';
+    const url = id ? `${API_URL}/documents/${id}` : `${API_URL}/documents`;
+
+    const data = {
+        title: document.getElementById('documentTitle').value,
+        subtitle: document.getElementById('documentSubtitle').value,
+        year: document.getElementById('documentYear').value ? parseInt(document.getElementById('documentYear').value) : null,
+        category: document.getElementById('documentCategory').value,
+        file_type: document.getElementById('documentFileType').value,
+        file_url: document.getElementById('documentFileUrl').value
+    };
+
+    const res = await fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        bootstrap.Modal.getInstance(document.getElementById('documentModal')).hide();
+        loadDocuments();
+    } else {
+        alert('Помилка збереження!');
+    }
+});
+
+async function deleteDocument(id) {
+    if (!confirm('Видалити цей документ?')) return;
+    await fetch(`${API_URL}/documents/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+    });
+    loadDocuments();
 }
 
 

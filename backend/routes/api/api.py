@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from ...models import db, Event, EventPhoto, EventVideo, EventDocument, Person, Document, GalleryAlbum, GalleryPhoto, GalleryVideoAlbum, GalleryVideo, User
 from ...constants import CATEGORIES
 from sqlalchemy import text
+from sqlalchemy.orm import selectinload
 import os
 import uuid
 import shutil
@@ -230,6 +231,8 @@ def get_events():
     year = request.args.get('year')
     category = request.args.get('category')
     search = request.args.get('search')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('limit', 10, type=int)
 
     query = Event.query
 
@@ -240,11 +243,20 @@ def get_events():
     if search:
         query = query.filter(Event.title.ilike(f'%{search}%'))
 
-    events = query.order_by(Event.year.desc()).all()
+    query = query.options(
+        selectinload(Event.photos),
+        selectinload(Event.videos),
+        selectinload(Event.documents)
+    )
+
+    pagination = query.order_by(Event.year.desc(), Event.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
 
     return jsonify({
-        "events": [event.to_dict() for event in events],
-        "categories": CATEGORIES
+        "events": [event.to_dict() for event in pagination.items],
+        "categories": CATEGORIES,
+        "page": page,
+        "total_pages": pagination.pages,
+        "total": pagination.total
     }), 200
 
 @api_bp.route('/events/<int:id>', methods=['PUT'])
@@ -316,8 +328,15 @@ def get_event(id):
 @api_bp.route('/persons', methods=['GET'])
 @jwt_required()
 def get_persons():
-    persons = Person.query.all()
-    return jsonify([p.to_dict() for p in persons])
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('limit', 10, type=int)
+    pagination = Person.query.order_by(Person.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    return jsonify({
+        "persons": [p.to_dict() for p in pagination.items],
+        "page": page,
+        "total_pages": pagination.pages,
+        "total": pagination.total
+    })
 
 @api_bp.route('/persons', methods=['POST'])
 @jwt_required()
@@ -381,8 +400,21 @@ def get_person(id):
 @api_bp.route('/documents', methods=['GET'])
 @jwt_required()
 def get_documents():
-    docs = Document.query.all()
-    return jsonify([d.to_dict() for d in docs])
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('limit', 10, type=int)
+    pagination = Document.query.order_by(Document.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    return jsonify({
+        "documents": [d.to_dict() for d in pagination.items],
+        "page": page,
+        "total_pages": pagination.pages,
+        "total": pagination.total
+    })
+
+@api_bp.route('/documents/<int:id>', methods=['GET'])
+@jwt_required()
+def get_document(id):
+    doc = Document.query.get_or_404(id)
+    return jsonify(doc.to_dict())
 
 @api_bp.route('/documents', methods=['POST'])
 @jwt_required()
@@ -392,16 +424,39 @@ def add_document():
     if not data or not 'title' in data or not 'file_url' in data:
         return jsonify({"error": "Title and File URL are required"}), 400
 
+    file_url = promote_file(data['file_url'])
+
     new_doc = Document(
         title=data['title'],
+        subtitle=data.get('subtitle', ''),
         category=data.get('category', 'Різне'),
-        file_url=data['file_url']
+        year=data.get('year'),
+        file_type=data.get('file_type', ''),
+        file_url=file_url
     )
 
     db.session.add(new_doc)
     db.session.commit()
 
     return jsonify(new_doc.to_dict()), 201
+
+@api_bp.route('/documents/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_document(id):
+    doc = Document.query.get_or_404(id)
+    data = request.json
+    
+    doc.title = data.get('title', doc.title)
+    doc.subtitle = data.get('subtitle', doc.subtitle)
+    doc.category = data.get('category', doc.category)
+    doc.year = data.get('year', doc.year)
+    doc.file_type = data.get('file_type', doc.file_type)
+    
+    if 'file_url' in data and data['file_url'] != doc.file_url:
+        doc.file_url = promote_file(data['file_url'])
+
+    db.session.commit()
+    return jsonify(doc.to_dict())
 
 @api_bp.route('/documents/<int:id>', methods=['DELETE'])
 @jwt_required()
@@ -418,8 +473,18 @@ def delete_document(id):
 @api_bp.route('/gallery/albums', methods=['GET'])
 @jwt_required()
 def get_gallery_albums():
-    albums = GalleryAlbum.query.all()
-    return jsonify([a.to_dict() for a in albums])
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('limit', 9, type=int)
+    
+    query = GalleryAlbum.query.options(selectinload(GalleryAlbum.photos))
+    pagination = query.order_by(GalleryAlbum.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    
+    return jsonify({
+        "albums": [a.to_dict() for a in pagination.items],
+        "page": page,
+        "total_pages": pagination.pages,
+        "total": pagination.total
+    })
 
 @api_bp.route('/gallery/albums', methods=['POST'])
 @jwt_required()
@@ -454,10 +519,14 @@ def delete_gallery_album(id):
 @api_bp.route('/gallery/video_albums', methods=['GET'])
 @jwt_required()
 def get_video_albums():
-    albums = GalleryVideoAlbum.query.all()
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('limit', 9, type=int)
+    
+    query = GalleryVideoAlbum.query.options(selectinload(GalleryVideoAlbum.videos))
+    pagination = query.order_by(GalleryVideoAlbum.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
 
     result = []
-    for album in albums:
+    for album in pagination.items:
         album_dict = {
             "id": album.id,
             "title": album.title,
@@ -466,7 +535,13 @@ def get_video_albums():
             "videos": [{"url": v.video_url, "caption": v.caption} for v in album.videos]
         }
         result.append(album_dict)
-    return jsonify(result)
+    
+    return jsonify({
+        "video_albums": result,
+        "page": page,
+        "total_pages": pagination.pages,
+        "total": pagination.total
+    })
 
 @api_bp.route('/gallery/video_albums', methods=['POST'])
 @jwt_required()

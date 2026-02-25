@@ -3,14 +3,26 @@ body {
     background-color: #f4f7f9;
     color: #333;
 }
-.navbar-brand { font-weight: 700; color: #ffc107 !important; }
+
+.navbar-brand {
+    font-weight: 700;
+    color: #ffc107 !important;
+}
 
 .header {
     background: linear-gradient(135deg, #002d5a 0%, #004a8f 100%);
     color: white;
-    padding: 150px;
+    padding: 150px 20px;
     border-radius: 0 0 30px 30px;
     margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 60px 20px;
+        border-radius: 0 0 15px 15px;
+        margin-bottom: 20px;
+    }
 }
 
 .navbar-brand {
@@ -18,35 +30,137 @@ body {
     color: #ffc107 !important;
 }
 
-.text-education { color: #107fff; }
-.text-science { color: #2ca02c; }
-.text-students { color: #ff7f0e; }
-.text-tech_innovation { color: #17becf; }
-.text-campus_development { color: #d62728; }
-.text-culture_social { color: #9467bd; }
-.text-leadership { color: #000000; }
-.text-international { color: #e377c2; }
-.text-community { color: #7f7f7f; }
+.text-education {
+    color: #107fff;
+}
 
-.bg-education { background-color: #107fff; color: #fff; }
-.bg-science { background-color: #2ca02c; color: #fff; }
-.bg-students { background-color: #ff7f0e; color: #fff; }
-.bg-tech_innovation { background-color: #17becf; color: #fff; }
-.bg-campus_development { background-color: #d62728; color: #fff; }
-.bg-culture_social { background-color: #9467bd; color: #fff; }
-.bg-leadership { background-color: #000000; color: #fff; }
-.bg-international { background-color: #e377c2; color: #fff; }
-.bg-community { background-color: #7f7f7f; color: #fff; }
+.text-science {
+    color: #2ca02c;
+}
+
+.text-students {
+    color: #ff7f0e;
+}
+
+.text-tech_innovation {
+    color: #17becf;
+}
+
+.text-campus_development {
+    color: #d62728;
+}
+
+.text-culture_social {
+    color: #9467bd;
+}
+
+.text-leadership {
+    color: #000000;
+}
+
+.text-international {
+    color: #e377c2;
+}
+
+.text-community {
+    color: #7f7f7f;
+}
+
+.bg-education {
+    background-color: #107fff;
+    color: #fff;
+}
+
+.bg-science {
+    background-color: #2ca02c;
+    color: #fff;
+}
+
+.bg-students {
+    background-color: #ff7f0e;
+    color: #fff;
+}
+
+.bg-tech_innovation {
+    background-color: #17becf;
+    color: #fff;
+}
+
+.bg-campus_development {
+    background-color: #d62728;
+    color: #fff;
+}
+
+.bg-culture_social {
+    background-color: #9467bd;
+    color: #fff;
+}
+
+.bg-leadership {
+    background-color: #000000;
+    color: #fff;
+}
+
+.bg-international {
+    background-color: #e377c2;
+    color: #fff;
+}
+
+.bg-community {
+    background-color: #7f7f7f;
+    color: #fff;
+}
 
 
-.pdf-textcolor { color: #d62728; }
-.doc-textcolor, .docx-textcolor { color: #107fff; }
-.xls-textcolor, .xlsx-textcolor { color: #228b22; }
-.ppt-textcolor, .pptx-textcolor { color: #ff7f0e; }
-.txt-textcolor { color: #8c564b; }
-.csv-textcolor { color: #2ca02c; }
-.jpg-textcolor, .jpeg-textcolor, .png-textcolor, .gif-textcolor { color: #2ca02c; }
-.mp3-textcolor, .wav-textcolor { color: #9467bd; }
-.mp4-textcolor, .mov-textcolor { color: #e377c2; }
-.zip-textcolor, .rar-textcolor { color: #7f7f7f; }
-.default-textcolor { color: #000000; } 
+.pdf-textcolor {
+    color: #d62728;
+}
+
+.doc-textcolor,
+.docx-textcolor {
+    color: #107fff;
+}
+
+.xls-textcolor,
+.xlsx-textcolor {
+    color: #228b22;
+}
+
+.ppt-textcolor,
+.pptx-textcolor {
+    color: #ff7f0e;
+}
+
+.txt-textcolor {
+    color: #8c564b;
+}
+
+.csv-textcolor {
+    color: #2ca02c;
+}
+
+.jpg-textcolor,
+.jpeg-textcolor,
+.png-textcolor,
+.gif-textcolor {
+    color: #2ca02c;
+}
+
+.mp3-textcolor,
+.wav-textcolor {
+    color: #9467bd;
+}
+
+.mp4-textcolor,
+.mov-textcolor {
+    color: #e377c2;
+}
+
+.zip-textcolor,
+.rar-textcolor {
+    color: #7f7f7f;
+}
+
+.default-textcolor {
+    color: #000000;
+}

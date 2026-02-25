@@ -168,6 +168,9 @@ class Document(db.Model):
         return {
             "id": self.id,
             "title": self.title,
+            "subtitle": self.subtitle,
             "category": self.category,
+            "year": self.year,
+            "file_type": self.file_type,
             "file_url": self.file_url
         }    
