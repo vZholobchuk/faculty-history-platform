@@ -274,13 +274,14 @@ def update_event(id):
     event.short_description = data.get('short_description', data.get('description', event.short_description))
     event.full_description = data.get('full_description', data.get('description', event.full_description))
     event.category = data.get('category', event.category)
-    event.media_url = data.get('media_url', event.media_url)
+    event.media_url = promote_file(data.get('media_url', event.media_url))
 
     if 'gallery' in data:
         EventPhoto.query.filter_by(event_id=id).delete()
         for url in data['gallery']:
+            promoted_url = promote_file(url)
             db.session.add(EventPhoto(
-                url=url,
+                url=promoted_url,
                 event_id=event.id
             ))
 
@@ -496,13 +497,14 @@ def add_gallery_album():
     new_album = GalleryAlbum(
         title=data['title'],
         description=data.get('description', ''),
-        cover_url=data.get('cover_url', '')
+        cover_url=promote_file(data.get('cover_url', ''))
     )
     db.session.add(new_album)
     db.session.flush()
 
     for photo_url in data.get('photos', []):
-        photo = GalleryPhoto(url=photo_url, album_id=new_album.id)
+        promoted_url = promote_file(photo_url)
+        photo = GalleryPhoto(url=promoted_url, album_id=new_album.id)
         db.session.add(photo)
 
     db.session.commit()
@@ -553,14 +555,14 @@ def add_video_album():
     new_album = GalleryVideoAlbum(
         title=data['title'],
         description=data.get('description', ''),
-        cover_url=data.get('cover_url', '')
+        cover_url=promote_file(data.get('cover_url', ''))
     )
     db.session.add(new_album)
     db.session.flush()
 
     for v_data in data.get('videos', []):
         video = GalleryVideo(
-            video_url=v_data.get('url'), 
+            video_url=promote_file(v_data.get('url')), 
             caption=v_data.get('caption', ''), 
             album_id=new_album.id
         )

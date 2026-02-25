@@ -323,11 +323,34 @@
                         <input type="file" class="form-control" onchange="uploadFile(this, 'albumCoverUrl')">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Фото (завантажити багато)</label>
-                        <input type="file" class="form-control" multiple
-                            onchange="uploadMultipleFiles(this, 'albumPhotosUrls')">
-                        <input type="hidden" id="albumPhotosUrls"> <!-- Stores comma separated URLs -->
-                        <div id="albumPhotosPreview" class="d-flex flex-wrap mt-2 gap-2"></div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0">Фотографії</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="photoInputToggle"
+                                    onchange="togglePhotoInput()">
+                                <label class="form-check-label" for="photoInputToggle">За посиланням (URL)</label>
+                            </div>
+                        </div>
+                        <div id="photoFileMode">
+                            <input type="file" class="form-control" multiple
+                                onchange="uploadMultipleFiles(this, 'albumPhotosUrls')">
+                            <input type="hidden" id="albumPhotosUrls"> <!-- Stores comma separated URLs -->
+                            <div id="albumPhotosPreview" class="d-flex flex-wrap mt-2 gap-2"></div>
+                        </div>
+                        <div id="photoUrlMode" class="d-none">
+                            <div id="photoUrlsContainer">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control photo-url-input" placeholder="https://...">
+                                    <button class="btn btn-outline-danger" type="button"
+                                        onclick="this.parentElement.remove()">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addPhotoUrlInput()">
+                                <i class="bi bi-plus"></i> Додати посилання
+                            </button>
+                        </div>
                     </div>
                     <div class="text-end">
                         <button type="submit" class="btn btn-primary">Створити Альбом</button>

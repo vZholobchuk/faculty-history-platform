@@ -35,7 +35,7 @@ def create_app():
     jwt = JWTManager(app)
 
     TEMP_UPLOAD_FOLDER = os.path.join(app.static_folder, 'temp')
-    UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
+    UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
     
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.config['TEMP_UPLOAD_FOLDER']= TEMP_UPLOAD_FOLDER

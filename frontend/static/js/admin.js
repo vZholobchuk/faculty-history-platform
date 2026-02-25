@@ -427,16 +427,75 @@ async function loadPhotoAlbums(page = 1) {
 
 function openPhotoAlbumModal() {
     document.getElementById('photoAlbumForm').reset();
+    document.getElementById('albumPhotosUrls').value = '';
+    const preview = document.getElementById('albumPhotosPreview');
+    if (preview) preview.innerHTML = '';
+
+    const toggle = document.getElementById('photoInputToggle');
+    if (toggle) {
+        toggle.checked = false;
+        togglePhotoInput();
+    }
+
+    const container = document.getElementById('photoUrlsContainer');
+    if (container) {
+        container.innerHTML = `
+            <div class="input-group mb-2">
+                <input type="text" class="form-control photo-url-input" placeholder="https://...">
+                <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        `;
+    }
+
     new bootstrap.Modal(document.getElementById('photoAlbumModal')).show();
+}
+
+function addPhotoUrlInput() {
+    const container = document.getElementById('photoUrlsContainer');
+    const div = document.createElement('div');
+    div.className = 'input-group mb-2';
+    div.innerHTML = `
+        <input type="text" class="form-control photo-url-input" placeholder="https://...">
+        <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()">
+            <i class="bi bi-x"></i>
+        </button>
+    `;
+    container.appendChild(div);
+}
+
+function togglePhotoInput() {
+    const isUrlMode = document.getElementById('photoInputToggle').checked;
+    if (isUrlMode) {
+        document.getElementById('photoFileMode').classList.add('d-none');
+        document.getElementById('photoUrlMode').classList.remove('d-none');
+    } else {
+        document.getElementById('photoFileMode').classList.remove('d-none');
+        document.getElementById('photoUrlMode').classList.add('d-none');
+    }
 }
 
 document.getElementById('photoAlbumForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    let photosList = [];
+    if (document.getElementById('photoInputToggle') && document.getElementById('photoInputToggle').checked) {
+        const inputs = document.querySelectorAll('.photo-url-input');
+        inputs.forEach(input => {
+            if (input.value.trim()) {
+                photosList.push(input.value.trim());
+            }
+        });
+    } else {
+        photosList = document.getElementById('albumPhotosUrls').value.split(',').filter(x => x);
+    }
+
     const data = {
         title: document.getElementById('albumTitle').value,
         description: document.getElementById('albumDesc').value,
         cover_url: document.getElementById('albumCoverUrl').value,
-        photos: document.getElementById('albumPhotosUrls').value.split(',').filter(x => x)
+        photos: photosList
     };
 
     const res = await fetch(`${API_URL}/gallery/albums`, {
@@ -657,12 +716,11 @@ async function uploadFile(input, targetId) {
     if (res.ok) {
         const data = await res.json();
         document.getElementById(targetId).value = data.url;
+        if (data.url.includes('/static/temp/')) {
+            tempFiles.push(data.url);
+        }
     } else {
-        alert('Upload failed');
-    }
-
-    if (data.url.includes('/static/temp/')) {
-        tempFiles.push(data.url);
+        alert('Помилка завантаження фото. Можливо, файл занадто великий.');
     }
 }
 
@@ -670,6 +728,7 @@ async function uploadFile(input, targetId) {
 async function uploadMultipleFiles(input, targetId) {
     const files = input.files;
     let urls = [];
+    let hasError = false;
 
     for (let i = 0; i < files.length; i++) {
         const formData = new FormData();
@@ -684,13 +743,24 @@ async function uploadMultipleFiles(input, targetId) {
         if (res.ok) {
             const data = await res.json();
             urls.push(data.url);
+            if (data.url.includes('/static/temp/')) {
+                tempFiles.push(data.url);
+            }
+        } else {
+            hasError = true;
         }
+    }
+
+    if (hasError) {
+        alert('Помилка завантаження деяких фото. Можливо, файли занадто великі.');
     }
 
     // Append to existing
     const existing = document.getElementById(targetId).value;
-    const sep = existing && existing.length > 0 ? ',' : '';
-    document.getElementById(targetId).value = existing + sep + urls.join(',');
+    const sep = existing && existing.length > 0 && urls.length > 0 ? ',' : '';
+    if (urls.length > 0) {
+        document.getElementById(targetId).value = existing + sep + urls.join(',');
+    }
 
     // Preview
     const preview = document.getElementById('albumPhotosPreview');
