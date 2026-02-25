@@ -602,21 +602,24 @@ async function loadDocuments(page = 1) {
 
     const data = await res.json();
     const documents = data.documents;
+    const categories = data.categories;
     const tbody = document.getElementById('documents-table-body');
     tbody.innerHTML = '';
 
-    const rows = documents.map(d => `
-        <tr>
+    const rows = documents.map(d => {
+        const userCategory = categories[d.category] ? categories[d.category].label : d.category;
+        
+        return `<tr>
             <td>${d.year || ''}</td>
             <td>${d.title}</td>
-            <td><span class="badge bg-secondary">${d.category || ''}</span></td>
+            <td><span class="badge bg-secondary">${userCategory || ''}</span></td>
             <td>${d.file_type || ''}</td>
             <td>
                 <button class="btn btn-sm btn-outline-warning" onclick="editDocument(${d.id})"><i class="bi bi-pencil"></i></button>
                 <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument(${d.id})"><i class="bi bi-trash"></i></button>
             </td>
         </tr>
-    `).join('');
+    `}).join('');
 
     tbody.innerHTML = rows;
     document.getElementById('documents-pagination').innerHTML = renderPagination(data.page, data.total_pages, 'loadDocuments');
