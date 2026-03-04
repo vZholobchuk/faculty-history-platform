@@ -37,6 +37,8 @@ def create_app():
     app.config["JWT_COOKIE_CSRF_PROTECT"] = False
     jwt = JWTManager(app)
 
+    app.config['MAX_CONTENT_LENGTH'] = 30 * 1024 * 1024
+
     cloudinary.config(
         secure=True
     )
