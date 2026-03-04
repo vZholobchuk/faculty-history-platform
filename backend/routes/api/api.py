@@ -103,41 +103,43 @@ def refresh():
     
     return response
 
-@app.route('/api/upload', methods=['POST'])
-# @jwt_required() ...
+@api_bp.route('/upload', methods=['POST'])
+@jwt_required()
 def upload_file():
-    file = request.files.get('file')
-    if not file:
-        return jsonify({"error": "No file"}), 400
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file'}), 400
 
-    filename = file.filename
-    # Check if it's an image or video; otherwise, it's 'raw'
-    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
-        res_type = "image"
-    elif filename.lower().endswith(('.mp4', '.mov', '.avi')):
-        res_type = "video"
-    else:
-        res_type = "raw"
+        file = request.files['file']
+        filename = file.filename
+        
+        ext = filename.lower().split('.')[-1]
+        if ext in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
+            res_type = "image"
+        elif ext in ['mp4', 'mov', 'avi']:
+            res_type = "video"
+        else:
+            res_type = "raw" 
 
-    # THE CRITICAL FIX:
-    # For 'raw' resources, Cloudinary requires the extension to be part of the public_id
-    # We use use_filename=True and keep the original filename
-    upload_result = cloudinary.uploader.upload(
-        file,
-        folder="events",
-        resource_type=res_type,
-        use_filename=True,       # Tells Cloudinary to use the original name
-        unique_filename=True,    # Keeps the 'abc123' suffix for safety
-        public_id=filename       # Forces the extension (e.g. .pptx) into the path
-    )
+        result = cloudinary.uploader.upload(
+            file,
+            folder="events",
+            resource_type=res_type,
+            public_id=filename, 
+            use_filename=True,
+            unique_filename=True
+        )
 
-    url = upload_result['secure_url']
+        url = result["secure_url"]
 
-    # Force the download behavior for raw files
-    if res_type == "raw":
-        url = url.replace("/upload/", "/upload/fl_attachment/")
+        if res_type == "raw":
+            url = url.replace("/upload/", "/upload/fl_attachment/")
 
-    return jsonify({"url": url}), 201
+        return jsonify({"url": url}), 201
+
+    except Exception as e:
+        print(f"UPLOAD ERROR: {str(e)}") # This will show in your terminal/logs
+        return jsonify({'error': str(e)}), 500
     
 # Check Database Connection
 @api_bp.route('/check_connection')
