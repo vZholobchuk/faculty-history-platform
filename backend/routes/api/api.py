@@ -113,24 +113,29 @@ def upload_file():
     filename = file.filename
     filename_lower = filename.lower()
 
+    # Determine resource type based on extension
     if filename_lower.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
         resource_type = "image"
-    elif filename_lower.endswith(('.mp4', '.mov')):
+    elif filename_lower.endswith(('.mp4', '.mov', '.avi', '.wmv')):
         resource_type = "video"
     else:
+        # For PDFs, Docs, etc.
         resource_type = "raw"
 
     public_id = os.path.splitext(filename)[0]
 
+    # Removed raw_convert="keep" as it causes the BadRequest error
     result = cloudinary.uploader.upload(
         file,
         folder="events",
         resource_type=resource_type,
-        public_id=public_id,
-        raw_convert="keep"
+        public_id=public_id
     )
 
     url = result["secure_url"]
+    
+    # If it's a raw file (like a PDF), adding the original filename 
+    # to the URL helps with browser downloads
     if resource_type == "raw":
         url += f"?filename={filename}"
 
