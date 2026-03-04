@@ -118,7 +118,7 @@ def upload_file():
     elif filename_lower.endswith(('.mp4', '.mov')):
         resource_type = "video"
     else:
-        resource_type = "raw"  # for pptx, pdf, docs, etc.
+        resource_type = "raw"
 
     public_id = os.path.splitext(filename)[0]
 
@@ -127,13 +127,11 @@ def upload_file():
         folder="events",
         resource_type=resource_type,
         public_id=public_id,
-        raw_convert="keep"  # keeps file extension for raw files
+        raw_convert="keep"
     )
 
-    # Return the URL with original filename as download suggestion
     url = result["secure_url"]
     if resource_type == "raw":
-        # Append original filename so browsers download it correctly
         url += f"?filename={filename}"
 
     return jsonify({"url": url}), 201
