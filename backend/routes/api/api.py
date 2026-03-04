@@ -6,6 +6,7 @@ from ...constants import CATEGORIES
 from sqlalchemy import text
 from sqlalchemy.orm import selectinload
 import cloudinary.uploader
+import os
 
 api_bp = Blueprint(
     'api',
@@ -108,27 +109,34 @@ def upload_file():
     if 'file' not in request.files:
         return jsonify({'error': 'No file'}), 400
 
-    print("CONTENT LENGTH:", request.content_length)
-
     file = request.files['file']
-    filename = file.filename.lower()
+    filename = file.filename
+    filename_lower = filename.lower()
 
-    if filename.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+    if filename_lower.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
         resource_type = "image"
-    elif filename.endswith(('.mp4', '.mov')):
+    elif filename_lower.endswith(('.mp4', '.mov')):
         resource_type = "video"
     else:
-        resource_type = "raw"
+        resource_type = "raw"  # for pptx, pdf, docs, etc.
+
+    public_id = os.path.splitext(filename)[0]
 
     result = cloudinary.uploader.upload(
         file,
         folder="events",
-        resource_type=resource_type
+        resource_type=resource_type,
+        public_id=public_id,
+        raw_convert="keep"  # keeps file extension for raw files
     )
 
-    return jsonify({
-        "url": result["secure_url"]
-    }), 201
+    # Return the URL with original filename as download suggestion
+    url = result["secure_url"]
+    if resource_type == "raw":
+        # Append original filename so browsers download it correctly
+        url += f"?filename={filename}"
+
+    return jsonify({"url": url}), 201
 
 # Check Database Connection
 @api_bp.route('/check_connection')
