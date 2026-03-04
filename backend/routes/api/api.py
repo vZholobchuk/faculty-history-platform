@@ -110,29 +110,28 @@ def upload_file():
         return jsonify({'error': 'No file'}), 400
 
     file = request.files['file']
-    if not file.filename:
-        return jsonify({'error': 'No selected file'}), 400
+    filename = file.filename
+    filename_lower = filename.lower()
 
-    try:
-        result = cloudinary.uploader.upload(
-            file,
-            folder="events",
-            resource_type="auto",
-            use_filename=True,
-            unique_filename=True
-        )
+    if filename_lower.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+        resource_type = "image"
+    elif filename_lower.endswith(('.mp4', '.mov', '.avi', '.wmv')):
+        resource_type = "video"
+    else:
+        resource_type = "raw"
 
-        url = result["secure_url"]
-        detected_type = result.get("resource_type")
+    result = cloudinary.uploader.upload(
+        file,
+        folder="events",
+        resource_type=resource_type,
+        use_filename=True,      
+        unique_filename=True,  
+        invalidate=True         
+    )
 
-        if detected_type == "raw":
-            url += f"?filename={file.filename}"
-
-        return jsonify({"url": url, "type": detected_type}), 201
-
-    except Exception as e:
-        current_app.logger.error(f"Cloudinary upload failed: {str(e)}")
-        return jsonify({"error": str(e)}), 400
+    url = result["secure_url"]
+    
+    return jsonify({"url": url}), 201
     
 # Check Database Connection
 @api_bp.route('/check_connection')
