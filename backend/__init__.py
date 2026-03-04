@@ -5,6 +5,9 @@ import os
 from flask_jwt_extended import JWTManager
 from .config import Config
 from datetime import timedelta
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 def create_app():
     app = Flask(
@@ -34,14 +37,9 @@ def create_app():
     app.config["JWT_COOKIE_CSRF_PROTECT"] = False
     jwt = JWTManager(app)
 
-    TEMP_UPLOAD_FOLDER = os.path.join(app.static_folder, 'temp')
-    UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
-    
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-    app.config['TEMP_UPLOAD_FOLDER']= TEMP_UPLOAD_FOLDER
-
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    os.makedirs(TEMP_UPLOAD_FOLDER, exist_ok=True)
+    cloudinary.config(
+        secure=True
+    )
 
     db.init_app(app)
 

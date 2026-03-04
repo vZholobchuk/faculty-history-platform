@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload
 import os
 import uuid
 import shutil
+import cloudinary.uploader
 
 api_bp = Blueprint(
     'api',
@@ -108,70 +109,19 @@ def refresh():
 @jwt_required()
 def upload_file():
     if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
+        return jsonify({'error': 'No file'}), 400
 
     file = request.files['file']
 
-    print("ORIGINAL FILENAME:", file.filename)
-
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-
-    original_name = file.filename
-    _, ext = os.path.splitext(original_name)
-
-    unique_filename = f"{uuid.uuid4().hex}{ext}"
-
-    upload_file=os.path.join(
-        current_app.config['TEMP_UPLOAD_FOLDER'],
-        unique_filename
+    result = cloudinary.uploader.upload(
+        file,
+        folder="events",
+        resource_type="auto"
     )
 
-    file.save(upload_file)
-
-    return jsonify({'url': f'/static/temp/{unique_filename}'}), 201
-
-def promote_file(temp_url):
-    if not temp_url or '/static/temp/' not in temp_url:
-        return temp_url
-
-    filename = temp_url.split('/')[-1]
-
-    temp_path = os.path.join(
-        current_app.config['TEMP_UPLOAD_FOLDER'],
-        filename
-    )
-
-    perm_path = os.path.join(
-        current_app.config['UPLOAD_FOLDER'],
-        filename
-    )
-
-    if os.path.exists(temp_path):
-        shutil.move(temp_path, perm_path)
-
-    return f'/static/uploads/{filename}'
-
-@api_bp.route('/cleanup-temp', methods=['POST'])
-@jwt_required()
-def cleanup_temp():
-    data = request.json
-    url = data.get('url')
-
-    if not url or '/static/temp/' not in url:
-        return jsonify({'message': 'Invalid url'}), 400
-
-    filename = url.split('/')[-1]
-
-    file_path = os.path.join(
-        current_app.config['TEMP_UPLOAD_FOLDER'],
-        filename
-    )
-
-    if os.path.exists(file_path):
-        os.remove(file_path)
-
-    return jsonify({'message': 'Deleted'})
+    return jsonify({
+        "url": result["secure_url"]
+    }), 201
 
 # Check Database Connection
 @api_bp.route('/check_connection')
@@ -193,23 +143,20 @@ def add_event():
     if not data or not 'title' in data or not 'year' in data:
         return jsonify({"error": "Title and Year are required"}), 400
 
-    media_url = promote_file(data.get('media_url', ''))
-
     new_event = Event(
         title=data['title'],
         year=data['year'],
         short_description=data.get('short_description', ''),
         full_description=data.get('full_description', ''),
         category=data['category'],
-        media_url=media_url
+        media_url=data.get('media_url')
     )
     
     db.session.add(new_event)
     db.session.flush()
 
     for url in data.get('gallery', []):
-        promoted_url = promote_file(url)
-        db.session.add(EventPhoto(url=promoted_url, event_id=new_event.id))
+        db.session.add(EventPhoto(url=url, event_id=new_event.id))
 
     for v in data.get('videos', []):
         db.session.add(EventVideo(
@@ -278,14 +225,13 @@ def update_event(id):
     event.short_description = data.get('short_description', data.get('description', event.short_description))
     event.full_description = data.get('full_description', data.get('description', event.full_description))
     event.category = data.get('category', event.category)
-    event.media_url = promote_file(data.get('media_url', event.media_url))
+    event.media_url = data.get('media_url', event.media_url)
 
     if 'gallery' in data:
         EventPhoto.query.filter_by(event_id=id).delete()
         for url in data['gallery']:
-            promoted_url = promote_file(url)
             db.session.add(EventPhoto(
-                url=promoted_url,
+                url=url,
                 event_id=event.id
             ))
 
@@ -430,7 +376,7 @@ def add_document():
     if not data or not 'title' in data or not 'file_url' in data:
         return jsonify({"error": "Title and File URL are required"}), 400
 
-    file_url = promote_file(data['file_url'])
+    file_url = data['file_url']
 
     new_doc = Document(
         title=data['title'],
@@ -459,7 +405,7 @@ def update_document(id):
     doc.file_type = data.get('file_type', doc.file_type)
     
     if 'file_url' in data and data['file_url'] != doc.file_url:
-        doc.file_url = promote_file(data['file_url'])
+        doc.file_url = data['file_url']
 
     db.session.commit()
     return jsonify(doc.to_dict())
@@ -502,13 +448,13 @@ def add_gallery_album():
     new_album = GalleryAlbum(
         title=data['title'],
         description=data.get('description', ''),
-        cover_url=promote_file(data.get('cover_url', ''))
+        cover_url=data.get('cover_url', '')
     )
     db.session.add(new_album)
     db.session.flush()
 
     for photo_url in data.get('photos', []):
-        promoted_url = promote_file(photo_url)
+        promoted_url = photo_url
         photo = GalleryPhoto(url=promoted_url, album_id=new_album.id)
         db.session.add(photo)
 
@@ -560,14 +506,14 @@ def add_video_album():
     new_album = GalleryVideoAlbum(
         title=data['title'],
         description=data.get('description', ''),
-        cover_url=promote_file(data.get('cover_url', ''))
+        cover_url=data.get('cover_url', '')
     )
     db.session.add(new_album)
     db.session.flush()
 
     for v_data in data.get('videos', []):
         video = GalleryVideo(
-            video_url=promote_file(v_data.get('url')), 
+            video_url=v_data.get('url'), 
             caption=v_data.get('caption', ''), 
             album_id=new_album.id
         )
@@ -594,7 +540,7 @@ def update_video_album(id):
     album.description = data.get('description', album.description)
 
     if 'cover_url' in data and data['cover_url'] != album.cover_url:
-        album.cover_url = promote_file(data['cover_url'])
+        album.cover_url = data['cover_url']
 
     # Update videos if provided
     if 'videos' in data:
@@ -604,7 +550,7 @@ def update_video_album(id):
         # Add new ones
         for v_data in data['videos']:
             video = GalleryVideo(
-                video_url=promote_file(v_data.get('url')),
+                video_url=v_data.get('url'),
                 caption=v_data.get('caption', ''),
                 album_id=id
             )
