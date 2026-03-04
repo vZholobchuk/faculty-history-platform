@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request, current_app, make_response
-from werkzeug.utils import secure_filename
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, create_refresh_token, get_jwt_identity, set_refresh_cookies, unset_jwt_cookies
 from werkzeug.security import generate_password_hash, check_password_hash
 from ...models import db, Event, EventPhoto, EventVideo, EventDocument, Person, Document, GalleryAlbum, GalleryPhoto, GalleryVideoAlbum, GalleryVideo, User
@@ -113,10 +112,15 @@ def upload_file():
 
     file = request.files['file']
 
+    print("ORIGINAL FILENAME:", file.filename)
+
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    unique_filename = f"{uuid.uuid4().hex}_{secure_filename(file.filename)}"
+    original_name = file.filename
+    _, ext = os.path.splitext(original_name)
+
+    unique_filename = f"{uuid.uuid4().hex}{ext}"
 
     upload_file=os.path.join(
         current_app.config['TEMP_UPLOAD_FOLDER'],
