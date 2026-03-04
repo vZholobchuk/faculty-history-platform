@@ -103,39 +103,37 @@ def refresh():
     
     return response
 
-@api_bp.route('/upload', methods=['POST'])
-@jwt_required()
+@app.route('/api/upload', methods=['POST'])
+# @jwt_required() ...
 def upload_file():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file'}), 400
+    file = request.files.get('file')
+    if not file:
+        return jsonify({"error": "No file"}), 400
 
-    file = request.files['file']
     filename = file.filename
-    filename_lower = filename.lower()
-
-    if filename_lower.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+    # Check if it's an image or video; otherwise, it's 'raw'
+    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
         res_type = "image"
-    elif filename_lower.endswith(('.mp4', '.mov')):
+    elif filename.lower().endswith(('.mp4', '.mov', '.avi')):
         res_type = "video"
     else:
         res_type = "raw"
 
-    # We split the filename to get the name without extension for the public_id
-    # Cloudinary will add the extension back for 'raw' files if use_filename=True
-    name_only = os.path.splitext(filename)[0]
-
-    result = cloudinary.uploader.upload(
+    # THE CRITICAL FIX:
+    # For 'raw' resources, Cloudinary requires the extension to be part of the public_id
+    # We use use_filename=True and keep the original filename
+    upload_result = cloudinary.uploader.upload(
         file,
         folder="events",
         resource_type=res_type,
-        use_filename=True,         # This is the key for correct download names
-        unique_filename=True,      # Prevents overwriting
-        public_id=name_only        # Forces the name to be 'МІФіЯ_репертуар'
+        use_filename=True,       # Tells Cloudinary to use the original name
+        unique_filename=True,    # Keeps the 'abc123' suffix for safety
+        public_id=filename       # Forces the extension (e.g. .pptx) into the path
     )
 
-    url = result["secure_url"]
-    
-    # Optional: Force attachment flag for raw files so they always download
+    url = upload_result['secure_url']
+
+    # Force the download behavior for raw files
     if res_type == "raw":
         url = url.replace("/upload/", "/upload/fl_attachment/")
 

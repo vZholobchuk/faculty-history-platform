@@ -658,16 +658,19 @@ async function loadDocuments(page = 1) {
     const rows = documents.map(d => {
         const userCategory = categories[d.category] ? categories[d.category].label : d.category;
         
-        return `<tr>
-            <td>${d.year || ''}</td>
-            <td>${d.title}</td>
-            <td><span class="badge bg-secondary">${userCategory || ''}</span></td>
-            <td>${d.file_type || ''}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-warning" onclick="editDocument(${d.id})"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument(${d.id})"><i class="bi bi-trash"></i></button>
-            </td>
-        </tr>
+            return `<tr>
+                <td>${d.year || ''}</td>
+                <td>${d.title}</td>
+                <td><span class="badge bg-secondary">${userCategory || ''}</span></td>
+                <td>${d.file_type || ''}</td>
+                <td>
+                    <a href="${d.file_url}" download="${d.title}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-download"></i>
+                    </a>
+                    <button class="btn btn-sm btn-outline-warning" onclick="editDocument(${d.id})"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument(${d.id})"><i class="bi bi-trash"></i></button>
+                </td>
+            </tr>
     `}).join('');
 
     tbody.innerHTML = rows;
