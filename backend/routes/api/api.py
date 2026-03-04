@@ -5,9 +5,6 @@ from ...models import db, Event, EventPhoto, EventVideo, EventDocument, Person, 
 from ...constants import CATEGORIES
 from sqlalchemy import text
 from sqlalchemy.orm import selectinload
-import os
-import uuid
-import shutil
 import cloudinary.uploader
 
 api_bp = Blueprint(
@@ -111,12 +108,22 @@ def upload_file():
     if 'file' not in request.files:
         return jsonify({'error': 'No file'}), 400
 
+    print("CONTENT LENGTH:", request.content_length)
+
     file = request.files['file']
+    filename = file.filename.lower()
+
+    if filename.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+        resource_type = "image"
+    elif filename.endswith(('.mp4', '.mov')):
+        resource_type = "video"
+    else:
+        resource_type = "raw"
 
     result = cloudinary.uploader.upload(
         file,
         folder="events",
-        resource_type="auto"
+        resource_type=resource_type
     )
 
     return jsonify({
