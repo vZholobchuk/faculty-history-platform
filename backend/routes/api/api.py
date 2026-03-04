@@ -111,9 +111,8 @@ def upload_file():
 
     file = request.files['file']
     filename = file.filename
-
-    # 1. Identify if it's raw
     filename_lower = filename.lower()
+
     if filename_lower.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
         res_type = "image"
     elif filename_lower.endswith(('.mp4', '.mov')):
@@ -121,17 +120,24 @@ def upload_file():
     else:
         res_type = "raw"
 
-    # 2. Upload with flags that FORCIBLY preserve the extension
+    # We split the filename to get the name without extension for the public_id
+    # Cloudinary will add the extension back for 'raw' files if use_filename=True
+    name_only = os.path.splitext(filename)[0]
+
     result = cloudinary.uploader.upload(
         file,
         folder="events",
         resource_type=res_type,
-        use_filename=True,         # Use 'МІФіЯ репертуар' instead of 'file'
-        unique_filename=True       # Adds a few chars so files don't collide
+        use_filename=True,         # This is the key for correct download names
+        unique_filename=True,      # Prevents overwriting
+        public_id=name_only        # Forces the name to be 'МІФіЯ_репертуар'
     )
 
-    # For 'raw' files, Cloudinary will now return a URL that includes the extension
     url = result["secure_url"]
+    
+    # Optional: Force attachment flag for raw files so they always download
+    if res_type == "raw":
+        url = url.replace("/upload/", "/upload/fl_attachment/")
 
     return jsonify({"url": url}), 201
     
